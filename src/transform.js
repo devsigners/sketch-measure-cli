@@ -97,9 +97,8 @@ function getStyleInfo (style) {
 const FILLTYPE_MAP = {
   '0': 'color'
 }
-const POSITION_MAP = {
-  '0': 'center'
-}
+
+const BORDER_POSITIONS = ['center', 'inside', 'outside']
 /**
  * Transform layer.style.borders
  * @param  {Array} borders border style list
@@ -111,7 +110,7 @@ function transformBorders (borders) {
     .map(v => {
       return {
         fillType: FILLTYPE_MAP[v.fillType],
-        position: POSITION_MAP[v.position],
+        position: BORDER_POSITIONS[v.position],
         thickness: v.thickness,
         color: transformColor(v.color)
       }
@@ -129,7 +128,6 @@ function transformFills (fills) {
     .map(v => {
       return {
         fillType: FILLTYPE_MAP[v.fillType],
-        position: POSITION_MAP[v.position],
         thickness: v.thickness,
         color: transformColor(v.color)
       }
