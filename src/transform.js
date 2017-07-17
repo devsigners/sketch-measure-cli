@@ -94,11 +94,10 @@ function getStyleInfo (style) {
   }
 }
 
-const FILLTYPE_MAP = {
-  '0': 'color'
-}
 
+const FILL_TYPES = ['color', 'gradient']
 const BORDER_POSITIONS = ['center', 'inside', 'outside']
+const GRADIENT_TYPES = ['linear', 'radial', 'angular']
 /**
  * Transform layer.style.borders
  * @param  {Array} borders border style list
@@ -108,12 +107,18 @@ function transformBorders (borders) {
   if (!borders || !borders.length) return []
   return borders.filter(v => v.isEnabled)
     .map(v => {
-      return {
-        fillType: FILLTYPE_MAP[v.fillType],
+      const fillType = FILL_TYPES[v.fillType]
+      const borderData = {
+        fillType,
         position: BORDER_POSITIONS[v.position],
-        thickness: v.thickness,
-        color: transformColor(v.color)
+        thickness: v.thickness
       }
+      if (fillType === 'color') {
+        borderData.color = transformColor(v.color)
+      } else if (fillType === 'gradient') {
+        borderData.gradient = transformGradient(v.gradient)
+      }
+      return borderData
     })
 }
 
@@ -126,11 +131,16 @@ function transformFills (fills) {
   if (!fills || !fills.length) return []
   return fills.filter(v => v.isEnabled)
     .map(v => {
-      return {
-        fillType: FILLTYPE_MAP[v.fillType],
-        thickness: v.thickness,
-        color: transformColor(v.color)
+      const fillType = FILL_TYPES[v.fillType]
+      const fillData = {
+        fillType
       }
+      if (fillType === 'color') {
+        fillData.color = transformColor(v.color)
+      } else if (fillType === 'gradient') {
+        fillData.gradient = transformGradient(v.gradient)
+      }
+      return fillData
     })
 }
 
@@ -173,6 +183,30 @@ function transformColor (color) {
     'argb-hex': `#${toHex(a * 255, 2)}${convertRGBToHex(r, g, b)}`,
     'css-rgba': `rgba(${r},${g},${b},${a})`,
     'ui-color': `(r:${color.red.toFixed(2)} g:${color.green.toFixed(2)} b:${color.blue.toFixed(2)} a:${a.toFixed(2)})`
+  }
+}
+
+function transformGradient (gradient) {
+  const stops = gradient.stops.map(stop => {
+    return {
+      color: transformColor(stop.color),
+      position: stop.position
+    }
+  })
+  const data = {
+    type: GRADIENT_TYPES[gradient.gradientType],
+    colorStops: stops,
+    from: transformPosition(gradient.from),
+    to: transformPosition(gradient.to),
+  }
+  return data
+}
+
+function transformPosition (position) {
+  const parts = position.slice(1, -1).split(/,\s*/)
+  return {
+    x: +parts[0],
+    y: +parts[1]
   }
 }
 
