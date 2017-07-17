@@ -1,0 +1,29 @@
+{
+  "name": "sketch-messure-cli",
+  "version": "1.0.0",
+  "description": "Cli tool for sketch-measure plugin",
+  "main": "src/index.js",
+  "dependencies": {
+    "mkdirp": "^0.5.1",
+    "tempfile": "^2.0.0",
+    "unzip": "^0.1.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/creeperyang/sketch-measure-cli.git"
+  },
+  "keywords": [
+    "sketch-measure",
+    "sketch"
+  ],
+  "author": "creeperyang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/creeperyang/sketch-measure-cli/issues"
+  },
+  "homepage": "https://github.com/creeperyang/sketch-measure-cli#readme"
+}
