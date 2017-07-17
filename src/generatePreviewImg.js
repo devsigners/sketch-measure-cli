@@ -29,7 +29,7 @@ function install () {
 }
 
 function generatePreviewImg (file, dest) {
-  return  promisedExec(`sketchtool -v`).catch(() => {
+  return promisedExec(`sketchtool -v`).catch(() => {
     return install()
   }).then(() => {
     return promisedExec(`sketchtool export artboards ${file} --output=${dest} --format="png" --scales="2.0"`).then(msg => {
@@ -39,5 +39,9 @@ function generatePreviewImg (file, dest) {
 }
 
 function rename (src, dest) {
-  return promisedExec(`mv ${src.replace(/\s/g, `\\ `)} ${dest.replace(/\s/g, `\ `)}`)
+  return promisedExec(`mv ${
+    src.replace(/\s/g, `\\ `)
+  } ${
+    dest.replace(/\s/g, `\\ `)
+  }`)
 }

@@ -10,6 +10,8 @@ const parseSketchFile = require('./parseSketchFile')
 const generatePage = require('./generateMeasurePage')
 const generatePreviewImg = require('./generatePreviewImg')
 
+module.exports = process
+
 function convert (meta, pages) {
   const result = prepareDefaultConfig()
   const pagesAndArtboards = meta.pagesAndArtboards
@@ -103,7 +105,7 @@ const POSITION_MAP = {
   '0': 'center'
 }
 function getStyleInfo (style) {
-  const borders = style.borders
+  const borders = style.borders && style.borders
     .filter(v => v.isEnabled)
     .map(v => {
       return {
@@ -113,7 +115,7 @@ function getStyleInfo (style) {
         color: handleColor(v.color)
       }
     })
-  const fills = style.fills
+  const fills = style.fills && style.fills
     .filter(v => v.isEnabled)
     .map(v => {
       return {
@@ -123,7 +125,7 @@ function getStyleInfo (style) {
         color: handleColor(v.color)
       }
     })
-  
+
   return {
     borders,
     fills
@@ -171,10 +173,3 @@ function process (sketchFile, dest) {
       )
     })
 }
-
-process(
-  '/Users/creeper/Desktop/Untitled.sketch',
-  '/Users/creeper/Desktop/tm'
-).catch(e => {
-  console.error(e)
-})
