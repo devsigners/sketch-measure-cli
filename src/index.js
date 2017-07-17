@@ -1,33 +1,48 @@
 const { join } = require('path')
-const convert = require('./transform')
+const Transformer = require('./transform')
 const parseSketchFile = require('./parseSketchFile')
 const generatePage = require('./generateMeasurePage')
-const generatePreviewImg = require('./generatePreviewImg')
+const {
+  generatePreviewImages,
+  generateSliceImages,
+  rename
+} = require('./generateImages')
 
 module.exports = process
 
 function process (sketchFile, dest) {
   const NAME_MAP = {}
+  let transformer
   return parseSketchFile(sketchFile)
+    // convert data
     .then(data => {
-      const processedData = convert(data.meta, data.pages)
+      transformer = new Transformer(data.meta, data.pages, {
+        savePath: dest
+      })
+      const processedData = transformer.convert()
       processedData.artboards.forEach(artboard => {
         NAME_MAP[artboard.name] = artboard.slug
       })
       return generatePage(processedData, dest)
     })
+    // process preview images
     .then(() => {
-      return generatePreviewImg(sketchFile, join(dest, 'preview'))
-    })
-    .then(images => {
-      return Promise.all(
-        images.map(name => {
-          const correctName = NAME_MAP[name]
-          return generatePreviewImg.rename(
-            join(dest, `preview/${name}@2x.png`),
-            join(dest, `preview/${correctName}.png`)
+      return generatePreviewImages(sketchFile, join(dest, 'preview'))
+        .then(images => {
+          return Promise.all(
+            images.map(name => {
+              const correctName = NAME_MAP[name]
+              return rename(
+                join(dest, `preview/${name}@2x.png`),
+                join(dest, `preview/${correctName}.png`)
+              )
+            })
           )
         })
-      )
+    })
+    // process slice images
+    .then(() => {
+      // NOTE: Maybe should use slice layer's scale here.
+      return generateSliceImages(sketchFile, transformer.assetsPath, transformer.result.scale)
     })
 }

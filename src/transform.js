@@ -1,3 +1,4 @@
+const { join } = require('path')
 const {
   toHex,
   convertRGBToHex,
@@ -6,29 +7,50 @@ const {
   getSlug
 } = require('./utils')
 
-module.exports = convert
-
+/**
+ * Layer Types.
+ * @type {Object}
+ */
 const TYPE_MAP = {
-  shapeGroup: 'shape'
-}
-const REVERSED_KEYS = ['name', 'rotation']
-function convertLayer (layer) {
-  const result = {
-    objectID: layer.do_objectID,
-    type: TYPE_MAP[layer._class] || layer._class
-  }
-  REVERSED_KEYS.forEach(k => {
-    result[k] = layer[k]
-  })
-  Object.assign(result, getStyleInfo(layer.style))
-  handleFrame(layer, result)
-  return result
+  text: 'text',
+  slice: 'slice',
+  symbolInstance: 'symbol',
+  shape: 'shape'
 }
 
 /**
- * 处理 frame
+ * Transform exportable for slices & symbols (has export size)
+ * @param  {Object} layer  layer data
+ * @param  {Object} result result
+ * @param  {Object} extra  extra info
+ * @return {Undefined}
  */
-function handleFrame (layer, result) {
+function transformExportable (layer, result, extra) {
+  const type = result.type
+  if (type === TYPE_MAP.slice || (
+    type === TYPE_MAP.symbolInstance
+    && layer.exportOptions.exportFormats.length
+  )) {
+    result.exportable = layer.exportOptions.exportFormats.map(v => {
+      const prefix = v.prefix || ''
+      const suffix = v.suffix || ''
+      return {
+        name: layer.name,
+        format: v.fileFormat,
+        scale: v.scale,
+        path: prefix + layer.name + suffix + '.' + v.fileFormat
+      }
+    })
+  }
+}
+
+/**
+ * Transform frame, get position & size
+ * @param  {Object} layer  layer data
+ * @param  {Object} result object to save transformed result
+ * @return {Undefined}
+ */
+function transformFrame (layer, result) {
   const frame = layer.frame
   result[frame._class] = {
     width: round(frame.width, 1),
@@ -39,14 +61,26 @@ function handleFrame (layer, result) {
 }
 
 /**
+ * Transform extra info.
+ * @param  {Object} layer  layer data
+ * @param  {Object} result object to save transformed result
+ * @return {Undefined}
+ */
+function transformExtraInfo (layer, result) {
+  // Set radius
+  if (layer.layers) {
+    const first = layer.layers[0]
+    if (first._class === 'rectangle') {
+      result.radius = first.fixedRadius
+    } else {
+      result.radius = 0
+    }
+  }
+}
+
+/**
  * 处理 style
  */
-const FILLTYPE_MAP = {
-  '0': 'color'
-}
-const POSITION_MAP = {
-  '0': 'center'
-}
 function getStyleInfo (style) {
   const borders = transformBorders(style.borders)
   const fills = transformFills(style.fills)
@@ -60,6 +94,12 @@ function getStyleInfo (style) {
   }
 }
 
+const FILLTYPE_MAP = {
+  '0': 'color'
+}
+const POSITION_MAP = {
+  '0': 'center'
+}
 /**
  * Transform layer.style.borders
  * @param  {Array} borders border style list
@@ -138,55 +178,111 @@ function transformColor (color) {
   }
 }
 
-function convert (meta, pages) {
-  const result = prepareDefaultConfig()
-  const pagesAndArtboards = meta.pagesAndArtboards
-  Object.keys(pagesAndArtboards).forEach(k => {
-    const page = pages[k]
-    const artboards = pagesAndArtboards[k].artboards
-    Object.keys(artboards).forEach(id => {
-      const slug = getSlug(page.name, artboards[id].name)
-      const pageMeta = {
-        pageName: page.name,
-        pageObjectID: k,
-        name: artboards[id].name,
-        slug,
-        objectID: id,
-        imagePath: `preview/${slug}.png`,
-        layers: []
-      }
-      let artboard
-      page.layers.some(l => {
-        if (l.do_objectID === id) {
-          artboard = l
-          return true
-        }
-      })
-      result.artboards.push(convertArtboard(
-        artboard,
-        pageMeta
-      ))
-    })
-  })
-  return result
-}
-
-function prepareDefaultConfig () {
-  return {
-    scale: '1',
-    unit: 'px',
-    colorFormat: 'color-hex',
-    artboards: [],
-    slices: [],
-    colors: []
-  }
-}
-
-function convertArtboard (artboard, pageMeta) {
+/**
+ * transform artboard.
+ * @param  {Object} artboard artboard data
+ * @param  {Object} pageMeta page meta
+ * @param  {Object} extra    extra info
+ * @return {Object}          transformed artboard data.
+ */
+function transformArtboard (artboard, pageMeta, extra) {
   pageMeta.width = artboard.frame.width
   pageMeta.height = artboard.frame.height
   artboard.layers.forEach(l => {
-    pageMeta.layers.push(convertLayer(l))
+    pageMeta.layers.push(transformLayer(l, extra))
   })
   return pageMeta
 }
+
+/**
+ * Get layer type.
+ * @param  {Object} layer layer data.
+ * @return {String}       layer type.
+ */
+function getLayerType (layer, extra) {
+  if (TYPE_MAP[layer._class]) {
+    return TYPE_MAP[layer._class]
+  } else if (layer.exportOptions.exportFormats.length) {
+    return TYPE_MAP.slice
+  }
+  return TYPE_MAP.shape
+}
+
+const REVERSED_KEYS = ['name', 'rotation']
+
+function transformLayer (layer, extra) {
+  const result = {
+    objectID: layer.do_objectID,
+    type: getLayerType(layer)
+  }
+  REVERSED_KEYS.forEach(k => {
+    result[k] = layer[k]
+  })
+  if (layer.style) {
+    Object.assign(result, getStyleInfo(layer.style))
+  }
+  transformFrame(layer, result)
+  transformExtraInfo(layer, result)
+  transformExportable(layer, result, extra)
+  return result
+}
+
+class Transformer {
+  constructor (meta, pages, extra) {
+    this.meta = meta
+    this.pages = pages
+    this.init(extra)
+  }
+  init ({ savePath }) {
+    this.savePath = savePath
+    this.assetsPath = join(savePath, 'assets')
+    // hardcode some values.
+    this.result = {
+      scale: '1',
+      unit: 'px',
+      colorFormat: 'color-hex',
+      artboards: [],
+      slices: [],
+      colors: []
+    }
+  }
+  convert () {
+    const pagesAndArtboards = this.meta.pagesAndArtboards
+    const pages = this.pages
+    const result = this.result
+    Object.keys(pagesAndArtboards).forEach(k => {
+      const page = pages[k]
+      const artboards = pagesAndArtboards[k].artboards
+      Object.keys(artboards).forEach(id => {
+        const slug = getSlug(page.name, artboards[id].name)
+        const pageMeta = {
+          pageName: page.name,
+          pageObjectID: k,
+          name: artboards[id].name,
+          slug,
+          objectID: id,
+          imagePath: `preview/${slug}.png`,
+          layers: []
+        }
+        let artboard
+        page.layers.some(l => {
+          if (l.do_objectID === id) {
+            artboard = l
+            return true
+          }
+        })
+        result.artboards.push(transformArtboard(
+          artboard,
+          pageMeta,
+          {
+            savePath: this.savePath,
+            assetsPath: this.assetsPath
+          }
+        ))
+      })
+    })
+    return result
+  }
+}
+
+module.exports = Transformer

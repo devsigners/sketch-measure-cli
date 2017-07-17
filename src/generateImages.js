@@ -2,8 +2,11 @@ const { exec } = require('child_process')
 
 const ROOT = '/Applications/Sketch.app/Contents/Resources/sketchtool'
 
-exports = module.exports = generatePreviewImg
-exports.rename = rename
+module.exports = {
+  rename,
+  generateSliceImages,
+  generatePreviewImages
+}
 
 const RE_IMG = /Exported\s([^\n]+)@2x.png\n?/g
 
@@ -28,11 +31,21 @@ function install () {
   return promisedExec(`bash ${ROOT}/install.sh`)
 }
 
-function generatePreviewImg (file, dest) {
+function generatePreviewImages (file, dest, scale) {
   return promisedExec(`sketchtool -v`).catch(() => {
     return install()
   }).then(() => {
-    return promisedExec(`sketchtool export artboards ${file} --output=${dest} --format="png" --scales="2.0"`).then(msg => {
+    return promisedExec(`sketchtool export artboards ${file} --output=${dest} --format="png" --scales="${scale || '2.0'}"`).then(msg => {
+      return getFilesFromMsg(msg)
+    })
+  })
+}
+
+function generateSliceImages (file, dest, scale) {
+  return promisedExec(`sketchtool -v`).catch(() => {
+    return install()
+  }).then(() => {
+    return promisedExec(`sketchtool export slices ${file} --output=${dest} --format="png" --scales="${scale || '2.0'}"`).then(msg => {
       return getFilesFromMsg(msg)
     })
   })
