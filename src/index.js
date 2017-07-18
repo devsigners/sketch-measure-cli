@@ -17,7 +17,11 @@ function process (sketchFile, dest) {
     // convert data
     .then(data => {
       transformer = new Transformer(data.meta, data.pages, {
-        savePath: dest
+        savePath: dest,
+        // Don't export symbol artboard.
+        // Because sketchtool doesn't offer cli to export symbols, we can't
+        // export single symbol image.
+        ignoreSymbolPage: true
       })
       const processedData = transformer.convert()
       processedData.artboards.forEach(artboard => {

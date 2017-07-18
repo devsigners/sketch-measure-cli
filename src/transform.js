@@ -94,7 +94,6 @@ function getStyleInfo (style) {
   }
 }
 
-
 const FILL_TYPES = ['color', 'gradient']
 const BORDER_POSITIONS = ['center', 'inside', 'outside']
 const GRADIENT_TYPES = ['linear', 'radial', 'angular']
@@ -197,7 +196,7 @@ function transformGradient (gradient) {
     type: GRADIENT_TYPES[gradient.gradientType],
     colorStops: stops,
     from: transformPosition(gradient.from),
-    to: transformPosition(gradient.to),
+    to: transformPosition(gradient.to)
   }
   return data
 }
@@ -265,9 +264,10 @@ class Transformer {
     this.pages = pages
     this.init(extra)
   }
-  init ({ savePath }) {
+  init ({ savePath, ignoreSymbolPage }) {
     this.savePath = savePath
     this.assetsPath = join(savePath, 'assets')
+    this.ignoreSymbolPage = ignoreSymbolPage
     // hardcode some values.
     this.result = {
       scale: '1',
@@ -284,6 +284,9 @@ class Transformer {
     const result = this.result
     Object.keys(pagesAndArtboards).forEach(k => {
       const page = pages[k]
+      if (this.ignoreSymbolPage && this.isSymbolPage(page)) {
+        return
+      }
       const artboards = pagesAndArtboards[k].artboards
       Object.keys(artboards).forEach(id => {
         const slug = getSlug(page.name, artboards[id].name)
@@ -314,6 +317,9 @@ class Transformer {
       })
     })
     return result
+  }
+  isSymbolPage (page) {
+    return page.layers.every(layer => layer._class === 'symbolMaster' || layer.symbolID)
   }
 }
 
