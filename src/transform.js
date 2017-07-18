@@ -22,10 +22,9 @@ const TYPE_MAP = {
  * Transform exportable for slices & symbols (has export size)
  * @param  {Object} layer  layer data
  * @param  {Object} result result
- * @param  {Object} extra  extra info
  * @return {Undefined}
  */
-function transformExportable (layer, result, extra) {
+function transformExportable (layer, result) {
   const type = result.type
   if (type === TYPE_MAP.slice || (
     type === TYPE_MAP.symbolInstance
@@ -219,8 +218,15 @@ function transformPosition (position) {
 function transformArtboard (artboard, pageMeta, extra) {
   pageMeta.width = artboard.frame.width
   pageMeta.height = artboard.frame.height
+  // Set extra.layers, give other transform* functions a way to operate layers.
+  extra.layers = pageMeta.layers
   artboard.layers.forEach(l => {
-    pageMeta.layers.push(transformLayer(l, extra))
+    const layer = transformLayer(l, extra)
+    pageMeta.layers.push(layer)
+    if (layer._appendLayers && layer._appendLayers.length) {
+      pageMeta.layers.push(...layer._appendLayers)
+      delete layer._appendLayers
+    }
   })
   return pageMeta
 }
@@ -254,17 +260,42 @@ function transformLayer (layer, extra) {
   }
   transformFrame(layer, result)
   transformExtraInfo(layer, result)
-  transformExportable(layer, result, extra)
+  transformExportable(layer, result)
+  if (result.type === 'symbol') {
+    result._appendLayers = handleSymbol(layer, result, Object.assign({}, extra, {
+      symbolMasterLayer: extra.symbols[layer.symbolID]
+    }))
+  }
   return result
 }
 
+/**
+ * If layer's type is symbol, we should special handle it:
+ * 1. Overwrite objectID.
+ * 2. Append symbol's content layer.
+ * @param  {Object} layer  layer
+ * @param  {Object} result result data
+ * @param  {Object} extra  extra info
+ * @return {Array}         layers should append
+ */
+function handleSymbol (layer, result, extra) {
+  const symbolMasterLayer = extra.symbolMasterLayer
+  const symbolObjectID = symbolMasterLayer.do_objectID
+  // Overwrite id.
+  result.objectID = symbolObjectID
+
+  return symbolMasterLayer.layers.map(l => {
+    const transformedLayer = transformLayer(l, extra)
+    transformedLayer.rect.x += result.rect.x
+    transformedLayer.rect.y += result.rect.y
+    return transformedLayer
+  })
+}
+
 class Transformer {
-  constructor (meta, pages, extra) {
+  constructor (meta, pages, { savePath, ignoreSymbolPage }) {
     this.meta = meta
     this.pages = pages
-    this.init(extra)
-  }
-  init ({ savePath, ignoreSymbolPage }) {
     this.savePath = savePath
     this.assetsPath = join(savePath, 'assets')
     this.ignoreSymbolPage = ignoreSymbolPage
@@ -277,14 +308,27 @@ class Transformer {
       slices: [],
       colors: []
     }
+    this._symbolPages = {}
+    Object.keys(meta.pagesAndArtboards).forEach(k => {
+      const page = pages[k]
+      if (this.isSymbolPage(page)) {
+        this._symbolPages[k] = page
+      }
+    })
   }
   convert () {
     const pagesAndArtboards = this.meta.pagesAndArtboards
     const pages = this.pages
     const result = this.result
+    const symbols = Object.keys(this._symbolPages).reduce((acc, val) => {
+      this._symbolPages[val].layers.forEach(v => {
+        acc[v.symbolID] = v
+      })
+      return acc
+    }, {})
     Object.keys(pagesAndArtboards).forEach(k => {
       const page = pages[k]
-      if (this.ignoreSymbolPage && this.isSymbolPage(page)) {
+      if (this.ignoreSymbolPage && this._symbolPages[k]) {
         return
       }
       const artboards = pagesAndArtboards[k].artboards
@@ -311,7 +355,8 @@ class Transformer {
           pageMeta,
           {
             savePath: this.savePath,
-            assetsPath: this.assetsPath
+            assetsPath: this.assetsPath,
+            symbols
           }
         ))
       })
