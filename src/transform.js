@@ -79,19 +79,26 @@ function transformExtraInfo (layer, result) {
 }
 
 /**
- * 处理 style
+ * Transform main style info: border/shadow/fill/opacity
+ * @param  {Object} layer  layer
+ * @param  {Object} result result
+ * @return {Undefined}
  */
-function getStyleInfo (style) {
-  const borders = transformBorders(style.borders)
-  const fills = transformFills(style.fills)
-  const shadows = transformShadows(style.shadows).concat(
-    transformShadows(style.innerShadows)
-  )
-  return {
-    borders,
-    fills,
-    shadows
+function transformStyle (layer, result) {
+  const style = layer.style
+  let opacity
+  if (style) {
+    result.borders = transformBorders(style.borders)
+    result.fills = transformFills(style.fills)
+    result.shadows = transformShadows(style.shadows).concat(
+      transformShadows(style.innerShadows)
+    )
+    opacity = style.contextSettings && style.contextSettings.opacity
   }
+  if (opacity == null && result.type !== 'slice') {
+    opacity = 1
+  }
+  result.opacity = opacity
 }
 
 const FILL_TYPES = ['color', 'gradient']
@@ -257,9 +264,7 @@ function transformLayer (layer, extra) {
   REVERSED_KEYS.forEach(k => {
     result[k] = layer[k]
   })
-  if (layer.style) {
-    Object.assign(result, getStyleInfo(layer.style))
-  }
+  transformStyle(layer, result)
   transformFrame(layer, result)
   transformExtraInfo(layer, result)
   transformExportable(layer, result)
