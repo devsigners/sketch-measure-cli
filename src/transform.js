@@ -70,7 +70,7 @@ function transformExtraInfo (layer, result) {
   // Set radius
   if (layer.layers) {
     const first = layer.layers[0]
-    if (first._class === 'rectangle') {
+    if (first && first._class === 'rectangle') {
       result.radius = first.fixedRadius
     } else {
       result.radius = 0
@@ -169,6 +169,7 @@ function transformShadows (shadows) {
  * @return {Object}       transformed color object
  */
 function transformColor (color) {
+  if (!color) return null
   const r = ~~(color.red * 255)
   const g = ~~(color.green * 255)
   const b = ~~(color.blue * 255)
