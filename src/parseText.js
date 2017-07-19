@@ -49,12 +49,16 @@ class TextStyle {
     this.textStyle = layer.style.textStyle
   }
   _getStyle (attributes) {
-    const {
+    let {
       MSAttributedStringFontAttribute,
       NSColor,
       NSKern,
       NSParagraphStyle
     } = attributes
+    // Prevent access error.
+    if (!NSParagraphStyle) {
+      NSParagraphStyle = {}
+    }
 
     const fontSize = MSAttributedStringFontAttribute.NSFontDescriptorAttributes.NSFontSizeAttribute
     const fontFace = MSAttributedStringFontAttribute.NSFontDescriptorAttributes.NSFontNameAttribute
@@ -127,10 +131,23 @@ class TextStyle {
   }
 
   decodeColor (NSColor) {
-    if (!NSColor || !NSColor.NSComponents) {
-      return null
+    if (!NSColor || (!NSColor.NSComponents && !NSColor.NSRGB)) {
+      return {
+        red: 255,
+        green: 255,
+        blue: 255,
+        alpha: 1
+      }
     }
-    const [red, green, blue, alpha] = NSColor.NSComponents.toString('ascii').split(' ')
+    let colors
+    if (NSColor.NSComponents) {
+      colors = NSColor.NSComponents.toString('ascii').split(' ')
+    } else {
+      // remove \u0000
+      const re = new RegExp(`\u0000`, 'g')
+      colors = NSColor.NSRGB.toString('ascii').replace(re, '').split(' ')
+    }
+    const [red, green, blue, alpha] = colors
     return {
       red: +red,
       green: +green,
