@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "Cli tool for sketch-measure plugin",
   "main": "src/index.js",
+  "bin": {
+    "sketch-measure": "bin/index.js"
+  },
   "dependencies": {
+    "commander": "^2.11.0",
     "mkdirp": "^0.5.1",
     "tempfile": "^2.0.0",
     "unzip": "^0.1.11"
@@ -17,7 +21,7 @@
     "eslint-plugin-standard": "^3.0.1"
   },
   "scripts": {
-    "lint": "eslint src",
+    "lint": "eslint src bin",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
