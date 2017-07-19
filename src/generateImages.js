@@ -1,5 +1,6 @@
-const { exec } = require('child_process')
+const { promisedExec } = require('./utils')
 
+// sketchtool path
 const ROOT = '/Applications/Sketch.app/Contents/Resources/sketchtool'
 
 module.exports = {
@@ -17,14 +18,6 @@ function getFilesFromMsg (msg) {
     files.push(match[1])
   }
   return files
-}
-
-function promisedExec (cmd) {
-  return new Promise((resolve, reject) => {
-    exec(cmd, (err, stdout) => {
-      err ? reject(err) : resolve(stdout)
-    })
-  })
 }
 
 function install () {

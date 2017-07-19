@@ -1,3 +1,5 @@
+const { exec } = require('child_process')
+
 function toHex (num, minLength) {
   let hex = num.toString(16)
   if (minLength && hex.length < minLength) {
@@ -48,3 +50,11 @@ function getSlug (pageName, artboardName) {
 }
 
 exports.getSlug = getSlug
+
+exports.promisedExec = function promisedExec (cmd) {
+  return new Promise((resolve, reject) => {
+    exec(cmd, (err, stdout) => {
+      err ? reject(err) : resolve(stdout)
+    })
+  })
+}

@@ -6,6 +6,7 @@ const {
   round,
   getSlug
 } = require('./utils')
+const parseText = require('./parseText')
 
 /**
  * Layer Types.
@@ -265,6 +266,8 @@ function transformLayer (layer, extra) {
     result._appendLayers = handleSymbol(layer, result, Object.assign({}, extra, {
       symbolMasterLayer: extra.symbols[layer.symbolID]
     }))
+  } else if (result.type === 'text') {
+    handleText(layer, result)
   }
   return result
 }
@@ -290,6 +293,17 @@ function handleSymbol (layer, result, extra) {
     transformedLayer.rect.y += result.rect.y
     return transformedLayer
   })
+}
+
+function handleText (layer, result) {
+  if (result.type !== 'text') return
+  const textInfo = parseText(layer, result)
+  // If fills exists, we should not overwrite color.
+  if (!layer.style.fills) {
+    result.color = transformColor(textInfo.color)
+  }
+  delete textInfo.color
+  Object.assign(result, textInfo)
 }
 
 class Transformer {
