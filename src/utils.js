@@ -1,6 +1,9 @@
 const { exec } = require('child_process')
 
 function toHex (num, minLength) {
+  if (typeof num !== 'number' || Number.isNaN(num)) {
+    throw new Error('First argument should be a number.')
+  }
   let hex = num.toString(16)
   if (minLength && hex.length < minLength) {
     hex = Array.apply(null, {
@@ -32,6 +35,9 @@ exports.convertRGBToHex = function convertRGBToHex (r, g, b) {
 }
 
 exports.toPercentage = function toPercentage (num, precision) {
+  if (typeof num !== 'number' || Number.isNaN(num)) {
+    throw new Error('First argument should be a number.')
+  }
   if (typeof precision !== 'number') {
     precision = 2
   }
@@ -40,6 +46,9 @@ exports.toPercentage = function toPercentage (num, precision) {
 
 const slugRe = /(\S+)\s+/g
 function getSlug (pageName, artboardName) {
+  if (!pageName || !artboardName || typeof pageName !== 'string' || typeof artboardName !== 'string') {
+    throw new Error('Arguments should be non-empty string.')
+  }
   let pn = pageName.replace(slugRe, (match, capture) => {
     return capture + '-'
   })
