@@ -4,6 +4,7 @@ const { resolve } = require('path')
 const program = require('commander')
 const pkg = require('../package.json')
 const convert = require('../src')
+let debug = () => {}
 
 program
   .version(pkg.version)
@@ -16,15 +17,18 @@ program
   .action((sketchFile, options) => {
     const src = resolve(sketchFile)
     const dest = resolve(options.dest || '.')
+    // load debug module after set process.env.DEBUG
     if (options.verbose) {
-      console.log(`src: ${src}, dest: ${dest}`)
+      process.env.DEBUG = 'sketch-measure-cli,sketch-measure-core'
+      debug = require('debug')('sketch-measure-cli')
     }
+    debug(`resolved cli args, src: %s, dest: %s`, src, dest)
     convert(src, dest)
       .then(() => {
         console.log('')
-        console.log('Success!')
-        console.log(`Open file:///${dest.slice(1)}/index.html in browser.`)
-        console.log(`And you can start a static server for better experience.`)
+        console.log('  Success!')
+        console.log(`  Open file:///${dest.slice(1)}/index.html in browser.`)
+        console.log(`  And you can start a static server for better experience.`)
         console.log('')
       })
       .catch(console.error.bind(console))
