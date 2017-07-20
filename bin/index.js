@@ -23,7 +23,7 @@ program
       .then(() => {
         console.log('')
         console.log('Success!')
-        console.log(`Open file:\\\\\\${dest.slice(1)}/index.html in browser.`)
+        console.log(`Open file:///${dest.slice(1)}/index.html in browser.`)
         console.log(`And you can start a static server for better experience.`)
         console.log('')
       })
