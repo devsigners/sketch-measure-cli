@@ -1,8 +1,13 @@
 const { createReadStream, readFile } = require('fs')
-const util = require('util')
 const unzip = require('unzip')
 const tempfile = require('tempfile')
-const pReadFile = util.promisify(readFile)
+const pReadFile = src => {
+  return new Promise((resolve, reject) => {
+    readFile(src, (err, data) => {
+      err ? reject(err) : resolve(data)
+    })
+  })
+}
 
 module.exports = parseSketchFile
 
