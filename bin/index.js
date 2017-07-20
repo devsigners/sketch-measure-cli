@@ -11,6 +11,7 @@ program
 
 program
   .command('convert <sketchFile>')
+  .alias('c')
   .description('convert sketch file to static html pages')
   .option('-d, --dest <dir>', 'Dest directory which html pages generate to.')
   .option('-v, --verbose', 'print details when execute commands.')
