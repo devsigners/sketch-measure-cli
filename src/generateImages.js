@@ -50,5 +50,7 @@ function rename (src, dest) {
 }
 
 function escape (url) {
-  return url && url.replace(/\s/g, `\\ `)
+  // Wrap with quotes, so space, parenthese and other special characters
+  // wont interrupt cli.
+  return `"${url}"`
 }
