@@ -48,15 +48,16 @@ function transformExportable (layer, result) {
  * Transform frame, get position & size
  * @param  {Object} layer  layer data
  * @param  {Object} result object to save transformed result
+ * @param  {Object} pos    parent layer's position
  * @return {Undefined}
  */
-function transformFrame (layer, result) {
+function transformFrame (layer, result, {x, y}) {
   const frame = layer.frame
   result[frame._class] = {
     width: round(frame.width, 1),
     height: round(frame.height, 1),
-    x: frame.x,
-    y: frame.y
+    x: frame.x + (x || 0),
+    y: frame.y + (y || 0)
   }
 }
 
@@ -229,15 +230,26 @@ function transformArtboard (artboard, pageMeta, extra) {
   pageMeta.height = artboard.frame.height
   // Set extra.layers, give other transform* functions a way to operate layers.
   extra.layers = pageMeta.layers
+  extra.parentPos = { x: 0, y: 0 }
   artboard.layers.forEach(l => {
     const layer = transformLayer(l, extra)
     pageMeta.layers.push(layer)
-    if (layer._appendLayers && layer._appendLayers.length) {
-      pageMeta.layers.push(...layer._appendLayers)
-      delete layer._appendLayers
-    }
+    recursiveAppendLayers(layer, pageMeta.layers)
   })
   return pageMeta
+  function recursiveAppendLayers (layer, store) {
+    const _appendLayers = layer && layer._appendLayers
+    if (!_appendLayers || !_appendLayers.length) {
+      return
+    }
+    store.push(_appendLayers[0])
+    delete layer._appendLayers
+    recursiveAppendLayers(_appendLayers[0], store)
+    store.push(..._appendLayers.slice(1))
+    _appendLayers.slice(1).forEach(l => {
+      recursiveAppendLayers(l, store)
+    })
+  }
 }
 
 /**
@@ -265,7 +277,7 @@ function transformLayer (layer, extra) {
     result[k] = layer[k]
   })
   transformStyle(layer, result)
-  transformFrame(layer, result)
+  transformFrame(layer, result, extra.parentPos || {})
   transformExtraInfo(layer, result)
   transformExportable(layer, result)
   if (result.type === 'symbol') {
@@ -274,8 +286,19 @@ function transformLayer (layer, extra) {
     }))
   } else if (result.type === 'text') {
     handleText(layer, result)
+  } else if (shouldTransformSubLayers(layer)) {
+    result._appendLayers = layer.layers.map(
+      l => transformLayer(l, Object.assign({}, extra, {
+        parentPos: result.rect
+      }))
+    )
   }
   return result
+}
+
+function shouldTransformSubLayers (layer) {
+  if (!layer || !layer.layers) return false
+  return layer.layers.length > 1
 }
 
 /**
