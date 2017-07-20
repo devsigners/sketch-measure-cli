@@ -1,5 +1,5 @@
 {
-  "name": "sketch-messure-cli",
+  "name": "sketch-measure-cli",
   "version": "1.0.0-alpha.2",
   "description": "Cli tool for sketch-measure plugin",
   "main": "src/index.js",
