@@ -3,7 +3,7 @@
 [sketch-measure](https://github.com/utom/sketch-measure) is a great plugin for sketch. Sometimes I want to embed it to workflow with cli, and it's really hard.
 Neither `sketchtool` nor [`coscript`](https://github.com/marekhrabe/coscript) give the full power to process skech files with sketch-measure.
 
-And finally I write *sketch-messure-cli* to help to use sketch-measure with cli. **surely it's not exactly the same as sketch-measure plugin.**
+And finally I write *sketch-messure-cli* to help to use sketch-measure with cli. **Surely it's not exactly the same as sketch-measure plugin.**
 
 ## Installation & Usage
 
