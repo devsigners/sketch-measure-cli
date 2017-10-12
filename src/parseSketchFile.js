@@ -33,8 +33,12 @@ function parseSketchFile (src) {
         path: dest
       }
       resolve(
-        parseJSONFile(`${dest}/meta.json`).then(meta => {
+        Promise.all([
+          parseJSONFile(`${dest}/meta.json`),
+          parseJSONFile(`${dest}/document.json`)
+        ]).then(([meta, document]) => {
           res.meta = meta
+          res.document = document
           res.pages = {}
           const ids = Object.keys(meta.pagesAndArtboards)
           return Promise.all(

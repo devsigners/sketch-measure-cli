@@ -312,6 +312,11 @@ function shouldTransformSubLayers (layer) {
  */
 function handleSymbol (layer, result, extra) {
   const symbolMasterLayer = extra.symbolMasterLayer
+  if (!symbolMasterLayer) {
+    console.log(layer)
+    console.log(result)
+    console.log(extra)
+  }
   const symbolObjectID = symbolMasterLayer.do_objectID
   // Overwrite id.
   result.objectID = symbolObjectID
@@ -336,7 +341,7 @@ function handleText (layer, result) {
 }
 
 class Transformer {
-  constructor (meta, pages, { savePath, ignoreSymbolPage }) {
+  constructor (meta, pages, { savePath, ignoreSymbolPage, foreignSymbols }) {
     this.meta = meta
     this.pages = pages
     this.savePath = savePath
@@ -352,6 +357,7 @@ class Transformer {
       colors: []
     }
     this._symbolPages = {}
+    this._foreignSymbols = foreignSymbols
     Object.keys(meta.pagesAndArtboards).forEach(k => {
       const page = pages[k]
       if (this.isSymbolPage(page)) {
@@ -359,16 +365,30 @@ class Transformer {
       }
     })
   }
-  convert () {
-    const pagesAndArtboards = this.meta.pagesAndArtboards
-    const pages = this.pages
-    const result = this.result
-    const symbols = Object.keys(this._symbolPages).reduce((acc, val) => {
+  getAllSymbols () {
+    if (this.symbols) {
+      return this.symbols
+    }
+    const symbols = this.symbols = {}
+    const foreignSymbols = this._foreignSymbols
+    Object.keys(this._symbolPages).reduce((acc, val) => {
       this._symbolPages[val].layers.forEach(v => {
         acc[v.symbolID] = v
       })
       return acc
-    }, {})
+    }, symbols)
+    if (foreignSymbols) {
+      foreignSymbols.forEach(v => {
+        symbols[v.symbolMaster.symbolID] = v.symbolMaster
+      })
+    }
+    return symbols
+  }
+  convert () {
+    const pagesAndArtboards = this.meta.pagesAndArtboards
+    const pages = this.pages
+    const result = this.result
+    const symbols = this.getAllSymbols()
     Object.keys(pagesAndArtboards).forEach(k => {
       const page = pages[k]
       if (this.ignoreSymbolPage && this._symbolPages[k]) {

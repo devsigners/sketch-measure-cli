@@ -21,7 +21,9 @@ function process (sketchFile, dest) {
         // Don't export symbol artboard.
         // Because sketchtool doesn't offer cli to export symbols, we can't
         // export single symbol image.
-        ignoreSymbolPage: true
+        ignoreSymbolPage: true,
+        // From version 47, sketch support library
+        foreignSymbols: data.document.foreignSymbols
       })
       const processedData = transformer.convert()
       processedData.artboards.forEach(artboard => {
