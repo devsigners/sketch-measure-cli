@@ -395,7 +395,10 @@ class Transformer {
         return
       }
       const artboards = pagesAndArtboards[k].artboards
-      Object.keys(artboards).forEach(id => {
+      const layers = page.layers
+      var reverseLayerIDs = []
+      layers.forEach(layer => reverseLayerIDs.unshift(layer.do_objectID))
+      reverseLayerIDs.forEach(id => {
         const slug = getSlug(page.name, artboards[id].name)
         const pageMeta = {
           pageName: page.name,
