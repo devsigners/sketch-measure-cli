@@ -23,7 +23,7 @@
     "mocha": "^3.4.2"
   },
   "scripts": {
-    "lint": "eslint src bin",
+    "lint": "eslint src bin test",
     "test": "mocha test/*.spec.js"
   },
   "repository": {

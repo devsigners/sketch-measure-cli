@@ -17,3 +17,6 @@ rules:
   operator-linebreak:
     - 2
     - "before"
+globals:
+  describe: true
+  it: true
