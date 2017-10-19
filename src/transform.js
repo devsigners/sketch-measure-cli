@@ -282,7 +282,8 @@ function transformLayer (layer, extra) {
   transformExportable(layer, result)
   if (result.type === 'symbol') {
     result._appendLayers = handleSymbol(layer, result, Object.assign({}, extra, {
-      symbolMasterLayer: extra.symbols[layer.symbolID]
+      symbolMasterLayer: extra.symbols[layer.symbolID],
+      processingSymbolID: layer.symbolID
     }))
   } else if (result.type === 'text') {
     handleText(layer, result)
@@ -313,9 +314,8 @@ function shouldTransformSubLayers (layer) {
 function handleSymbol (layer, result, extra) {
   const symbolMasterLayer = extra.symbolMasterLayer
   if (!symbolMasterLayer) {
-    console.log(layer)
-    console.log(result)
-    console.log(extra)
+    console.warn(`Miss symbol: ${extra.processingSymbolID}.`)
+    return
   }
   const symbolObjectID = symbolMasterLayer.do_objectID
   // Overwrite id.
@@ -356,14 +356,7 @@ class Transformer {
       slices: [],
       colors: []
     }
-    this._symbolPages = {}
     this._foreignSymbols = foreignSymbols
-    Object.keys(meta.pagesAndArtboards).forEach(k => {
-      const page = pages[k]
-      if (this.isSymbolPage(page)) {
-        this._symbolPages[k] = page
-      }
-    })
   }
   getAllSymbols () {
     if (this.symbols) {
@@ -371,9 +364,11 @@ class Transformer {
     }
     const symbols = this.symbols = {}
     const foreignSymbols = this._foreignSymbols
-    Object.keys(this._symbolPages).reduce((acc, val) => {
-      this._symbolPages[val].layers.forEach(v => {
-        acc[v.symbolID] = v
+    Object.keys(this.pages).reduce((acc, val) => {
+      this.pages[val].layers.forEach(v => {
+        if (this.isSymbol(v)) {
+          acc[v.symbolID] = v
+        }
       })
       return acc
     }, symbols)
@@ -391,13 +386,18 @@ class Transformer {
     const symbols = this.getAllSymbols()
     Object.keys(pagesAndArtboards).forEach(k => {
       const page = pages[k]
-      if (this.ignoreSymbolPage && this._symbolPages[k]) {
-        return
-      }
       const artboards = pagesAndArtboards[k].artboards
       const layers = page.layers
       var reverseLayerIDs = []
-      layers.forEach(layer => reverseLayerIDs.unshift(layer.do_objectID))
+      layers.forEach(layer => {
+        // Ensure the layer is an artbord, and
+        // Remove all symbol arbords If ignoreSymbolPage is true.
+        if (artboards[layer.do_objectID]) {
+          if (!this.ignoreSymbolPage || !this.isSymbol(layer)) {
+            reverseLayerIDs.unshift(layer.do_objectID)
+          }
+        }
+      })
       reverseLayerIDs.forEach(id => {
         const slug = getSlug(page.name, artboards[id].name)
         const pageMeta = {
@@ -429,8 +429,8 @@ class Transformer {
     })
     return result
   }
-  isSymbolPage (page) {
-    return page.layers.every(layer => layer._class === 'symbolMaster' || layer.symbolID)
+  isSymbol (layer) {
+    return layer._class === 'symbolMaster' || layer.symbolID
   }
 }
 
