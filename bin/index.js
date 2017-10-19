@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { resolve } = require('path')
+const { resolve, basename, extname } = require('path')
 const program = require('commander')
 const pkg = require('../package.json')
 const convert = require('../src')
@@ -17,7 +17,9 @@ program
   .option('-v, --verbose', 'print details when execute commands.')
   .action((sketchFile, options) => {
     const src = resolve(sketchFile)
-    const dest = resolve(options.dest || '.')
+    const dest = resolve(
+      options.dest || basename(sketchFile, extname(sketchFile))
+    )
     // load debug module after set process.env.DEBUG
     if (options.verbose) {
       process.env.DEBUG = 'sketch-measure-cli,sketch-measure-core'
