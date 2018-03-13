@@ -1,7 +1,8 @@
 const { promisedExec } = require('./utils')
 
 // sketchtool path
-const ROOT = '/Applications/Sketch.app/Contents/Resources/sketchtool'
+const sketchtool
+= '/Applications/Sketch.app/Contents/Resources/sketchtool/bin/sketchtool'
 
 module.exports = {
   rename,
@@ -20,28 +21,28 @@ function getFilesFromMsg (msg) {
   }
   return Object.keys(files)
 }
-
-function install () {
-  return promisedExec(`bash ${ROOT}/install.sh`)
-}
+// sketch removed 'install.sh' From v49
+// function install () {
+//   return promisedExec(`${ROOT}/install.sh`)
+// }
 
 function generatePreviewImages (file, dest, scale) {
-  return promisedExec(`sketchtool -v`).catch(() => {
-    return install()
-  }).then(() => {
-    return promisedExec(`sketchtool export artboards ${escape(file)} --output=${escape(dest)} --format="png" --scales="${scale || '2.0'}"`).then(msg => {
-      return getFilesFromMsg(msg)
-    })
+  return promisedExec(`${sketchtool} -v`).then(() => {
+    return promisedExec(`${sketchtool} export artboards ${escape(file)} --output=${escape(dest)} --format='png' --scales='${scale || '2.0'}'`).then(
+      msg => {
+        return getFilesFromMsg(msg)
+      }
+    )
   })
 }
 
 function generateSliceImages (file, dest, scale) {
-  return promisedExec(`sketchtool -v`).catch(() => {
-    return install()
-  }).then(() => {
-    return promisedExec(`sketchtool export slices ${escape(file)} --output=${escape(dest)} --format="png" --scales="${scale || '2.0'}"`).then(msg => {
-      return getFilesFromMsg(msg)
-    })
+  return promisedExec(`${sketchtool} -v`).then(() => {
+    return promisedExec(`${sketchtool} export slices ${escape(file)} --output=${escape(dest)} --format='png' --scales='${scale || '2.0'}'`).then(
+      msg => {
+        return getFilesFromMsg(msg)
+      }
+    )
   })
 }
 
