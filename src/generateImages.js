@@ -28,7 +28,7 @@ function getFilesFromMsg (msg) {
 
 function generatePreviewImages (file, dest, scale) {
   return promisedExec(`${sketchtool} -v`).then(() => {
-    return promisedExec(`${sketchtool} export artboards ${escape(file)} --output=${escape(dest)} --format='png' --scales='${scale || '2.0'}'`).then(
+    return promisedExec(`${sketchtool} export artboards ${escape(file)} --output=${escape(dest)} --format='png' --use-id-for-name=YES --scales='${scale || '2.0'}'`).then(
       msg => {
         return getFilesFromMsg(msg)
       }

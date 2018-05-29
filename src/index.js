@@ -27,7 +27,7 @@ function process (sketchFile, dest) {
       })
       const processedData = transformer.convert()
       processedData.artboards.forEach(artboard => {
-        NAME_MAP[artboard.name] = artboard.slug
+        NAME_MAP[artboard.objectID] = artboard.slug
       })
       return generatePage(processedData, dest)
     })

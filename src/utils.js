@@ -44,17 +44,14 @@ exports.toPercentage = function toPercentage (num, precision) {
   return (num * 100).toFixed(precision) + '%'
 }
 
-const slugRe = /(\S+)\s+/g
+const slugRe = /(\s+|\/+)/g
 function getSlug (pageName, artboardName) {
   if (!pageName || !artboardName || typeof pageName !== 'string' || typeof artboardName !== 'string') {
     throw new Error('Arguments should be non-empty string.')
   }
-  let pn = pageName.replace(slugRe, (match, capture) => {
-    return capture + '-'
-  })
-  let an = artboardName.replace(slugRe, (match, capture) => {
-    return capture + '-'
-  })
+  let pn = pageName.replace(slugRe, '-')
+  let an = artboardName.replace(slugRe, '-')
+
   return (pn + '-' + an).toLowerCase()
 }
 
