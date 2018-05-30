@@ -1,7 +1,7 @@
 function parseText (layer) {
   const textStyle = new TextStyle(layer)
-  const text = layer.attributedString.string;
-  
+  const text = layer.attributedString.string
+
   const res = {
     content: text
   }
@@ -23,7 +23,7 @@ class TextStyle {
   _getStyle () {
     const fontSize = this.encodeAttr.MSAttributedStringFontAttribute.attributes.size
     const fontFace = this.encodeAttr.MSAttributedStringFontAttribute.attributes.name
-    const paragraphStyle = this.encodeAttr.paragraphStyle || {};
+    const paragraphStyle = this.encodeAttr.paragraphStyle || {}
 
     // Default to left
     let textAlign = 'left'
@@ -62,7 +62,6 @@ class TextStyle {
   getTextStyle () {
     return this._getStyle()
   }
-
 }
 
 module.exports = parseText
