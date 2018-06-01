@@ -7,6 +7,7 @@ const {
   getSlug
 } = require('./utils')
 const parseText = require('./parseText')
+const parseTextV50 = require('./parseText.v50')
 
 /**
  * Layer Types.
@@ -220,19 +221,20 @@ function transformPosition (position) {
 
 /**
  * transform artboard.
- * @param  {Object} artboard artboard data
- * @param  {Object} pageMeta page meta
- * @param  {Object} extra    extra info
- * @return {Object}          transformed artboard data.
+ * @param  {Object} artboard   artboard data
+ * @param  {Object} pageMeta   page meta
+ * @param  {Object} extra      extra info
+ * @param  {String} appVersion app version
+ * @return {Object}            transformed artboard data.
  */
-function transformArtboard (artboard, pageMeta, extra) {
+function transformArtboard (artboard, pageMeta, extra, appVersion) {
   pageMeta.width = artboard.frame.width
   pageMeta.height = artboard.frame.height
   // Set extra.layers, give other transform* functions a way to operate layers.
   extra.layers = pageMeta.layers
   extra.parentPos = { x: 0, y: 0 }
   artboard.layers.forEach(l => {
-    const layer = transformLayer(l, extra)
+    const layer = transformLayer(l, extra, appVersion)
     pageMeta.layers.push(layer)
     recursiveAppendLayers(layer, pageMeta.layers)
   })
@@ -268,7 +270,7 @@ function getLayerType (layer, extra) {
 
 const REVERSED_KEYS = ['name', 'rotation']
 
-function transformLayer (layer, extra) {
+function transformLayer (layer, extra, appVersion) {
   const result = {
     objectID: layer.do_objectID,
     type: getLayerType(layer)
@@ -284,14 +286,14 @@ function transformLayer (layer, extra) {
     result._appendLayers = handleSymbol(layer, result, Object.assign({}, extra, {
       symbolMasterLayer: extra.symbols[layer.symbolID],
       processingSymbolID: layer.symbolID
-    }))
+    }), appVersion)
   } else if (result.type === 'text') {
-    handleText(layer, result)
+    handleText(layer, result, appVersion)
   } else if (shouldTransformSubLayers(layer)) {
     result._appendLayers = layer.layers.map(
       l => transformLayer(l, Object.assign({}, extra, {
         parentPos: result.rect
-      }))
+      }), appVersion)
     )
   }
   return result
@@ -306,12 +308,13 @@ function shouldTransformSubLayers (layer) {
  * If layer's type is symbol, we should special handle it:
  * 1. Overwrite objectID.
  * 2. Append symbol's content layer.
- * @param  {Object} layer  layer
- * @param  {Object} result result data
- * @param  {Object} extra  extra info
- * @return {Array}         layers should append
+ * @param  {Object} layer       layer
+ * @param  {Object} result      result data
+ * @param  {Object} extra       extra info
+ * @param  {String} appVersion  app version
+ * @return {Array}              layers should append
  */
-function handleSymbol (layer, result, extra) {
+function handleSymbol (layer, result, extra, appVersion) {
   const symbolMasterLayer = extra.symbolMasterLayer
   if (!symbolMasterLayer) {
     console.warn(`Miss symbol: ${extra.processingSymbolID}.`)
@@ -322,16 +325,17 @@ function handleSymbol (layer, result, extra) {
   result.objectID = symbolObjectID
 
   return symbolMasterLayer.layers.map(l => {
-    const transformedLayer = transformLayer(l, extra)
+    const transformedLayer = transformLayer(l, extra, appVersion)
     transformedLayer.rect.x += result.rect.x
     transformedLayer.rect.y += result.rect.y
     return transformedLayer
   })
 }
 
-function handleText (layer, result) {
+function handleText (layer, result, appVersion) {
   if (result.type !== 'text') return
-  const textInfo = parseText(layer, result)
+
+  const textInfo = parseFloat(appVersion) >= 50 ? parseTextV50(layer, result) : parseText(layer, result)
   // If fills exists, we should not overwrite color.
   if (!layer.style.fills) {
     result.color = transformColor(textInfo.color)
@@ -423,7 +427,8 @@ class Transformer {
             savePath: this.savePath,
             assetsPath: this.assetsPath,
             symbols
-          }
+          },
+          this.meta.appVersion
         ))
       })
     })

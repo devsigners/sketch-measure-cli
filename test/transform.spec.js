@@ -6,7 +6,7 @@ const Transformer = require('../src/transform')
 describe('Test transform', () => {
   it('should transform sketch file data correctly', done => {
     parseSketchFile(
-      resolve(__dirname, '../assets/test.sketch')
+      resolve(__dirname, '../assets/demo.sketch')
     ).then(res => {
       const transformer = new Transformer(res.meta, res.pages, {
         savePath: 'tmp',

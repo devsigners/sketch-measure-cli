@@ -5,7 +5,7 @@ const parseSketchFile = require('../src/parseSketchFile')
 describe('Test parseSketchFile', () => {
   it('should parse sketch file correctly', done => {
     parseSketchFile(
-      resolve(__dirname, '../assets/test.sketch')
+      resolve(__dirname, '../assets/demo.sketch')
     ).then(res => {
       assert.deepEqual(
         Object.keys(res.meta.pagesAndArtboards),
@@ -17,7 +17,7 @@ describe('Test parseSketchFile', () => {
         {
           commit: '4e7e2f5d7940a711b59f89190b5b7e3029f050f5',
           version: 103,
-          fonts: ["PingFangSC-Regular"],
+          fonts: ['PingFangSC-Regular'],
           compatibilityVersion: 99,
           app: 'com.bohemiancoding.sketch3',
           autosaved: 0,
