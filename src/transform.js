@@ -52,7 +52,7 @@ function transformExportable (layer, result) {
  * @param  {Object} pos    parent layer's position
  * @return {Undefined}
  */
-function transformFrame (layer, result, {x, y}) {
+function transformFrame (layer, result, { x, y }) {
   const frame = layer.frame
   result[frame._class] = {
     width: round(frame.width, 1),

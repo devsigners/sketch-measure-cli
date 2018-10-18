@@ -25,7 +25,8 @@ program
       process.env.DEBUG = 'sketch-measure-cli,sketch-measure-core'
       debug = require('debug')('sketch-measure-cli')
     }
-    debug(`resolved cli args, src: %s, dest: %s`, src, dest)
+    debug(`src: %s`, dest)
+    debug(`dest: %s`, dest)
     convert(src, dest)
       .then(() => {
         console.log('')

@@ -14,15 +14,15 @@ describe('Test transform', () => {
         foreignSymbols: res.document.foreignSymbols
       })
       const result = transformer.convert()
-      assert.equal(
+      assert.strictEqual(
         result.artboards.length,
         1
       )
-      assert.equal(
+      assert.strictEqual(
         result.artboards[0].layers.length,
         4
       )
-      assert.deepEqual(
+      assert.deepStrictEqual(
         result.artboards[0].layers[0],
         {
           objectID: 'C2E55C0B-4D07-433C-B687-783631565627',
@@ -36,7 +36,7 @@ describe('Test transform', () => {
           rect: { width: 174, height: 50, x: 104, y: 124 }
         }
       )
-      assert.deepEqual(
+      assert.deepStrictEqual(
         result.artboards[0].layers[1],
         {
           objectID: '1277BCA8-2E07-4B55-9A56-3C2902E394FC',
@@ -79,7 +79,7 @@ describe('Test transform', () => {
           radius: 0
         }
       )
-      assert.deepEqual(
+      assert.deepStrictEqual(
         result.artboards[0].layers[2],
         {
           objectID: 'AADF9D36-622E-4097-8B33-9780CDF71558',

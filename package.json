@@ -8,19 +8,19 @@
   },
   "dependencies": {
     "commander": "^2.11.0",
-    "debug": "^2.6.8",
+    "debug": "^4.1.0",
     "mkdirp": "^0.5.1",
     "tempfile": "^2.0.0",
     "unzip": "^0.1.11"
   },
   "devDependencies": {
-    "eslint": "^4.2.0",
-    "eslint-config-standard": "^10.2.1",
-    "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-node": "^5.1.0",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^3.0.1",
-    "mocha": "^3.4.2"
+    "eslint": "^5.7.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "mocha": "^5.2.0"
   },
   "scripts": {
     "lint": "eslint src bin test --fix",
@@ -28,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/creeperyang/sketch-measure-cli.git"
+    "url": "git+https://github.com/devsigners/sketch-measure-cli.git"
   },
   "keywords": [
     "sketch-measure",
@@ -37,7 +37,7 @@
   "author": "creeperyang",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/creeperyang/sketch-measure-cli/issues"
+    "url": "https://github.com/devsigners/sketch-measure-cli/issues"
   },
-  "homepage": "https://github.com/creeperyang/sketch-measure-cli#readme"
+  "homepage": "https://github.com/devsigners/sketch-measure-cli#readme"
 }

@@ -7,12 +7,12 @@ describe('Test parseSketchFile', () => {
     parseSketchFile(
       resolve(__dirname, '../assets/demo.sketch')
     ).then(res => {
-      assert.deepEqual(
+      assert.deepStrictEqual(
         Object.keys(res.meta.pagesAndArtboards),
         Object.keys(res.pages)
       )
       delete res.meta.pagesAndArtboards
-      assert.deepEqual(
+      assert.deepStrictEqual(
         res.meta,
         {
           commit: '4e7e2f5d7940a711b59f89190b5b7e3029f050f5',
