@@ -81,6 +81,29 @@ function transformExtraInfo (layer, result) {
 }
 
 /**
+ * Transform layer.css
+ * @param  {Object} layer layer
+ * @param  {Object} layer result
+ * @return {Undefined}
+ */
+function transformCss(layer, result) {
+
+  console.log(layer);
+
+  const layerCSSAttributes = layer.CSSAttributes;
+  let css = [];
+
+  if(layerCSSAttributes){}
+
+  for(var i = 0; i < layerCSSAttributes.count(); i++) {
+      var c = layerCSSAttributes[i]
+      if(! /\/\*/.exec(c) ) css.push(this.toJSString(c));
+  }
+
+  result.css = css
+}
+
+/**
  * Transform main style info: border/shadow/fill/opacity
  * @param  {Object} layer  layer
  * @param  {Object} result result
@@ -278,6 +301,7 @@ function transformLayer (layer, extra, appVersion) {
   REVERSED_KEYS.forEach(k => {
     result[k] = layer[k]
   })
+  // transformCss(layer, result)
   transformStyle(layer, result)
   transformFrame(layer, result, extra.parentPos || {})
   transformExtraInfo(layer, result)

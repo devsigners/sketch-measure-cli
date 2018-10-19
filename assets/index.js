@@ -898,87 +898,90 @@ I18N['zh-cn'] = {
                 html.push(this.propertyType('SHADOWS', shadows.join('')));
             }
             // CODE TEMPLATE
-            if(layerData.css && layerData.css.length > 0){
-                var tab =  ['<ul class="tab" id="code-tab" >',
-                        '<li class="icon-css-panel" data-id="css-panel" data-codeType="css"></li>',
-                        '<li class="icon-android-panel" data-id="android-panel" data-codeType="android" ></li>',
-                        '<li class="icon-ios-panel" data-id="ios-panel" data-codeType="ios" ></li>',
-                        '</ul>'].join('')
-                var css = [
-                    '<div id="css-panel" class="code-item item">',
-                    '<label><textarea id="css" rows="' + (layerData.css.length + 1) + '" readonly="readonly">' + layerData.css.join("\r\n") + '</textarea></label>',
-                    '</div>'
-                ].join('');
+            var tab = [
+                '<ul class="tab" id="code-tab" >',
+                '<li class="icon-css-panel" data-id="css-panel" data-codeType="css"></li>',
+                '<li class="icon-android-panel" data-id="android-panel" data-codeType="android" ></li>',
+                '<li class="icon-ios-panel" data-id="ios-panel" data-codeType="ios" ></li>',
+                '</ul>'].join('')
+            
+            var css = '';
+            // var css = [
+            //     '<div id="css-panel" class="code-item item">',
+            //     '<label><textarea id="css" rows="' + (layerData.css.length + 1) + '" readonly="readonly">' + layerData.css.join("\r\n") + '</textarea></label>',
+            //     '</div>'].join('')
 
-                var android = [];
-                if(layerData.type == "text"){
-                    android.push(
-                            '<div id="android-panel"  class="code-item item">',
-                            '<label><textarea id="css" rows="6" readonly="readonly">'
-                            + "&lt;TextView\r\n" + this.getAndroidWithHeight(layerData)
-                            + "android:text=\"" + layerData.content + "\"\r\n" + "android:textColor=\"" + layerData.color["argb-hex"] + "\"\r\n"
-                            + "android:textSize=\"" + this.unitSize(layerData.fontSize, true) + "\"\r\n" + "/&gt;" + '</textarea></label>',
-                            '</div>'
-                    );
-                }else if (layerData.type == "shape"){
-                    android.push(
-                            '<div id="android-panel" class="code-item item">',
-                            '<label><textarea id="css" rows="6" readonly="readonly">'
-                            + "&lt;View\r\n" + this.getAndroidWithHeight(layerData)
-                            + this.getAndroidShapeBackground(layerData)
-                            + "/&gt;" + '</textarea></label>',
-                            '</div>'
-                    );
-                } else if (layerData.type = "slice"){
-                    android.push(
-                            '<div id="android-panel" class="code-item item">',
-                            '<label><textarea id="css" rows="6" readonly="readonly">'
-                            + "&lt;ImageView\r\n" + this.getAndroidWithHeight(layerData)
-                            + this.getAndroidImageSrc(layerData) + "/&gt;"
-                            + '</textarea></label>',
-                            '</div>'
-                    );
-                }
+            
 
-                var ios = [];
-                if(layerData.type == "text"){
-                    ios.push(
-                            '<div id="ios-panel"  class="code-item item">',
-                            '<label><textarea id="css" rows="6" readonly="readonly">'
-                            + "UILabel *label = [[UILabel alloc] init];\r\n"
-                            + "label.frame = CGRectMake(" + this.scaleSize(layerData.rect.x) + "\, " + this.scaleSize(layerData.rect.y) + "\, "
-                            + this.scaleSize(layerData.rect.width) + "\, " + this.scaleSize(layerData.rect.height) + ");\r\n"
-                            + "label.text = \@\"" + layerData.content + "\";\r\n"
-                            + "label.font = [UIFont fontWithName:\@\"" + layerData.fontFace + "\" size:" + this.scaleSize(layerData.fontSize) + "];\r\n"
-                            + "label.textColor = [UIColor colorWithRed:" + layerData.color.r + "/255.0 green:" + layerData.color.g + "/255.0 blue:" + layerData.color.b + "/255.0 alpha:" + layerData.color.a + "/1.0];\r\n"
-                            + '</textarea></label>',
-                            '</div>'
-                    );
-                }else if (layerData.type == "shape"){
-                    ios.push(
-                            '<div id="ios-panel" class="code-item item">',
-                            '<label><textarea id="css" rows="6" readonly="readonly">'
-                            + "UIView *view = [[UIView alloc] init];\r\n"
-                            + "view.frame = CGRectMake(" + this.scaleSize(layerData.rect.x) + "\, " + this.scaleSize(layerData.rect.y) + "\, "
-                            + this.scaleSize(layerData.rect.width) + "\, " + this.scaleSize(layerData.rect.height) + ");\r\n"
-                            + this.getIOSShapeBackground(layerData)
-                            + '</textarea></label>',
-                            '</div>'
-                    );
-                } else if (layerData.type = "slice"){
-                    ios.push(
-                            '<div id="ios-panel" class="code-item item">',
-                            '<label><textarea id="css" rows="6" readonly="readonly">'
-                            + "UIImageView *imageView = [[UIImageView alloc] init];\r\n"
-                            + "imageView.frame = CGRectMake(" + this.scaleSize(layerData.rect.x) + "\, " + this.scaleSize(layerData.rect.y) + "\, "
-                            + this.scaleSize(layerData.rect.width) + "\, " + this.scaleSize(layerData.rect.height) + ");\r\n"
-                            + this.getIOSImageSrc(layerData)
-                            + '</textarea></label>',
-                            '</div>'
-                    );
-                }
-                html.push(this.propertyType('CODE TEMPLATE', [ tab, css, android.join(''), ios.join('') ].join(''), true));
+            var android = [];
+            if(layerData.type == "text"){
+                android.push(
+                        '<div id="android-panel"  class="code-item item">',
+                        '<label><textarea id="css" rows="6" readonly="readonly">'
+                        + "&lt;TextView\r\n" + this.getAndroidWithHeight(layerData)
+                        + "android:text=\"" + layerData.content + "\"\r\n" + "android:textColor=\"" + layerData.color["argb-hex"] + "\"\r\n"
+                        + "android:textSize=\"" + this.unitSize(layerData.fontSize, true) + "\"\r\n" + "/&gt;" + '</textarea></label>',
+                        '</div>'
+                );
+            }else if (layerData.type == "shape"){
+                android.push(
+                        '<div id="android-panel" class="code-item item">',
+                        '<label><textarea id="css" rows="6" readonly="readonly">'
+                        + "&lt;View\r\n" + this.getAndroidWithHeight(layerData)
+                        + this.getAndroidShapeBackground(layerData)
+                        + "/&gt;" + '</textarea></label>',
+                        '</div>'
+                );
+            } else if (layerData.type = "slice"){
+                android.push(
+                        '<div id="android-panel" class="code-item item">',
+                        '<label><textarea id="css" rows="6" readonly="readonly">'
+                        + "&lt;ImageView\r\n" + this.getAndroidWithHeight(layerData)
+                        + this.getAndroidImageSrc(layerData) + "/&gt;"
+                        + '</textarea></label>',
+                        '</div>'
+                );
             }
+
+            var ios = [];
+            if(layerData.type == "text"){
+                ios.push(
+                        '<div id="ios-panel"  class="code-item item">',
+                        '<label><textarea id="css" rows="6" readonly="readonly">'
+                        + "UILabel *label = [[UILabel alloc] init];\r\n"
+                        + "label.frame = CGRectMake(" + this.scaleSize(layerData.rect.x) + "\, " + this.scaleSize(layerData.rect.y) + "\, "
+                        + this.scaleSize(layerData.rect.width) + "\, " + this.scaleSize(layerData.rect.height) + ");\r\n"
+                        + "label.text = \@\"" + layerData.content + "\";\r\n"
+                        + "label.font = [UIFont fontWithName:\@\"" + layerData.fontFace + "\" size:" + this.scaleSize(layerData.fontSize) + "];\r\n"
+                        + "label.textColor = [UIColor colorWithRed:" + layerData.color.r + "/255.0 green:" + layerData.color.g + "/255.0 blue:" + layerData.color.b + "/255.0 alpha:" + layerData.color.a + "/1.0];\r\n"
+                        + '</textarea></label>',
+                        '</div>'
+                );
+            }else if (layerData.type == "shape"){
+                ios.push(
+                        '<div id="ios-panel" class="code-item item">',
+                        '<label><textarea id="css" rows="6" readonly="readonly">'
+                        + "UIView *view = [[UIView alloc] init];\r\n"
+                        + "view.frame = CGRectMake(" + this.scaleSize(layerData.rect.x) + "\, " + this.scaleSize(layerData.rect.y) + "\, "
+                        + this.scaleSize(layerData.rect.width) + "\, " + this.scaleSize(layerData.rect.height) + ");\r\n"
+                        + this.getIOSShapeBackground(layerData)
+                        + '</textarea></label>',
+                        '</div>'
+                );
+            } else if (layerData.type = "slice"){
+                ios.push(
+                        '<div id="ios-panel" class="code-item item">',
+                        '<label><textarea id="css" rows="6" readonly="readonly">'
+                        + "UIImageView *imageView = [[UIImageView alloc] init];\r\n"
+                        + "imageView.frame = CGRectMake(" + this.scaleSize(layerData.rect.x) + "\, " + this.scaleSize(layerData.rect.y) + "\, "
+                        + this.scaleSize(layerData.rect.width) + "\, " + this.scaleSize(layerData.rect.height) + ");\r\n"
+                        + this.getIOSImageSrc(layerData)
+                        + '</textarea></label>',
+                        '</div>'
+                );
+            }
+            html.push(this.propertyType('CODE TEMPLATE', [ tab, css, android.join(''), ios.join('') ].join(''), true));
+            
             //  EXPORTABLE
             if(layerData.exportable && layerData.exportable.length > 0){
                 var expHTML = [],
@@ -1430,7 +1433,7 @@ I18N['zh-cn'] = {
                 scale: this.project.scale,
                 unit: this.project.unit,
                 colorFormat: this.project.colorFormat,
-                codeType: 'css'
+                codeType: 'android'
             };
         this.artboardIndex = (!isNaN(path.artboard))? path.artboard: 0;
         this.current = this.project.artboards[this.artboardIndex];
