@@ -7,6 +7,7 @@ I18N['zh-cn'] = {
     "PROPERTIES": "属性",
     "FILLS": "填充",
     "TYPEFACE": "字体",
+    "TEXTSTYLE": "名称",
     "BORDERS": "边框",
     "SHADOWS": "阴影",
     "CSS STYLE": "CSS 样式",
@@ -838,12 +839,17 @@ I18N['zh-cn'] = {
                                 '<label data-label="' +_('Line') + '"><input id="line-height" type="text" value="' + this.unitSize(layerData.lineHeight, true) + '" readonly="readonly"></label>',
                             '</div>'
                         ].join(''),
+                    textStyle = (layerData.textStyle) ? [
+                            '<div class="item" data-label="' +_('TEXTSTYLE') + ':">',
+                                '<label><input id="textstyle" type="text" value="' + (layerData.textStyle) + '" readonly="readonly"></label>',
+                            '</div>'
+                        ].join(''): '',
                     content = [
                             '<div class="item">',
                                 '<label data-label="' + _('Content') + '"><textarea id="content" rows="2" readonly="readonly">' + layerData.content + '</textarea></label>',
                             '</div>'
                         ].join('');
-                html.push(this.propertyType('TYPEFACE', [ fontFamily, textColor, fontSize, spacing, content ].join('')));
+                html.push(this.propertyType('TYPEFACE', [ fontFamily, textColor, fontSize, spacing, textStyle, content ].join('')));
             }
             // BORDERS
             if(layerData.borders && layerData.borders.length > 0){
@@ -905,13 +911,11 @@ I18N['zh-cn'] = {
                 '<li class="icon-ios-panel" data-id="ios-panel" data-codeType="ios" ></li>',
                 '</ul>'].join('')
             
-            var css = '';
-            // var css = [
-            //     '<div id="css-panel" class="code-item item">',
-            //     '<label><textarea id="css" rows="' + (layerData.css.length + 1) + '" readonly="readonly">' + layerData.css.join("\r\n") + '</textarea></label>',
-            //     '</div>'].join('')
-
-            
+            var css = [];
+            var css = [
+                '<div id="css-panel" class="code-item item">',
+                '<label><textarea id="css" rows="' + (layerData.css.length + 1) + '" readonly="readonly">' + layerData.css.join("\r\n") + '</textarea></label>',
+                '</div>'].join('')
 
             var android = [];
             if(layerData.type == "text"){
@@ -1433,7 +1437,7 @@ I18N['zh-cn'] = {
                 scale: this.project.scale,
                 unit: this.project.unit,
                 colorFormat: this.project.colorFormat,
-                codeType: 'android'
+                codeType: 'css'
             };
         this.artboardIndex = (!isNaN(path.artboard))? path.artboard: 0;
         this.current = this.project.artboards[this.artboardIndex];

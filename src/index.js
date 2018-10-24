@@ -23,7 +23,8 @@ function process (sketchFile, dest) {
         // export single symbol image.
         ignoreSymbolPage: true,
         // From version 47, sketch support library
-        foreignSymbols: data.document.foreignSymbols
+        foreignSymbols: data.document.foreignSymbols,
+        layerTextStyles: data.document.layerTextStyles
       })
       const processedData = transformer.convert()
       processedData.artboards.forEach(artboard => {

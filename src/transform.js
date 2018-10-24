@@ -20,6 +20,15 @@ const TYPE_MAP = {
   shape: 'shape'
 }
 
+const FONT_WEIGHT = {
+  Ultralight: 'lighter',
+  Thin: '300',
+  Light: '300',
+  Medium: 'bold',
+  Semibold: 'bolder',
+  Regular: 'normal'
+}
+
 /**
  * Transform exportable for slices & symbols (has export size)
  * @param  {Object} layer  layer data
@@ -70,37 +79,17 @@ function transformFrame (layer, result, { x, y }) {
  */
 function transformExtraInfo (layer, result) {
   // Set radius
-  if (layer.layers) {
-    const first = layer.layers[0]
-    if (first && first._class === 'rectangle') {
-      result.radius = first.fixedRadius
-    } else {
-      result.radius = 0
-    }
-  }
-}
+  // if (layer.layers) {
+  //   const first = layer.layers[0]
+  //   if (first && first._class === 'rectangle') {
+  //     result.radius = first.fixedRadius
+  //   } else {
+  //     result.radius = 0
+  //   }
+  // }
 
-/**
- * Transform layer.css
- * @param  {Object} layer layer
- * @param  {Object} layer result
- * @return {Undefined}
- */
-function transformCss(layer, result) {
-
-  console.log(layer);
-
-  const layerCSSAttributes = layer.CSSAttributes;
-  let css = [];
-
-  if(layerCSSAttributes){}
-
-  for(var i = 0; i < layerCSSAttributes.count(); i++) {
-      var c = layerCSSAttributes[i]
-      if(! /\/\*/.exec(c) ) css.push(this.toJSString(c));
-  }
-
-  result.css = css
+  const radius = layer.fixedRadius;
+  radius && (result.radius = radius);
 }
 
 /**
@@ -129,6 +118,7 @@ function transformStyle (layer, result) {
 const FILL_TYPES = ['color', 'gradient']
 const BORDER_POSITIONS = ['center', 'inside', 'outside']
 const GRADIENT_TYPES = ['linear', 'radial', 'angular']
+
 /**
  * Transform layer.style.borders
  * @param  {Array} borders border style list
@@ -301,7 +291,7 @@ function transformLayer (layer, extra, appVersion) {
   REVERSED_KEYS.forEach(k => {
     result[k] = layer[k]
   })
-  // transformCss(layer, result)
+  
   transformStyle(layer, result)
   transformFrame(layer, result, extra.parentPos || {})
   transformExtraInfo(layer, result)
@@ -312,7 +302,7 @@ function transformLayer (layer, extra, appVersion) {
       processingSymbolID: layer.symbolID
     }), appVersion)
   } else if (result.type === 'text') {
-    handleText(layer, result, appVersion)
+    handleText(layer, result, appVersion, extra.textStyles)
   } else if (shouldTransformSubLayers(layer)) {
     result._appendLayers = layer.layers.map(
       l => transformLayer(l, Object.assign({}, extra, {
@@ -320,6 +310,10 @@ function transformLayer (layer, extra, appVersion) {
       }), appVersion)
     )
   }
+
+  appendCss(result);
+  appendRNCss(result);
+
   return result
 }
 
@@ -356,7 +350,7 @@ function handleSymbol (layer, result, extra, appVersion) {
   })
 }
 
-function handleText (layer, result, appVersion) {
+function handleText (layer, result, appVersion, textStyles) {
   if (result.type !== 'text') return
 
   const textInfo = parseFloat(appVersion) >= 50 ? parseTextV50(layer, result) : parseText(layer, result)
@@ -365,11 +359,140 @@ function handleText (layer, result, appVersion) {
     result.color = transformColor(textInfo.color)
   }
   delete textInfo.color
+
+  if(textStyles.length > 0 && layer.sharedStyleID) {
+    textInfo.textStyle = textStyles.find( ts => ts.objectID === layer.sharedStyleID).name
+  }
+
   Object.assign(result, textInfo)
 }
 
+/**
+ * transform css color
+ * @param  {Object} color color
+ * @return {String}
+ */
+function transformCSSColor (color) {
+  return color.a === 1 ? color['color-hex'].split(' ')[0] : color['css-rgba']
+}
+
+/**
+ * transform css radius
+ * @param  {Object} radius radius
+ * @return {String}
+ */
+function transformCSSRadius (radius) {
+  if(radius) {
+    return `border-radius: ${radius}px;`
+  }
+}
+
+/**
+ * transform css border
+ * @param  {Object} border border
+ * @return {String}
+ */
+function transformCSSBorder (border) {
+  if(border.length) {
+    const { thickness, color } = border[0]
+
+    return `border: ${thickness}px solid ${transformCSSColor(color)};`
+  }
+}
+
+/**
+ * transform css background
+ * @param  {Object} fills fills
+ * @return {String}
+ */
+function transformCSSBackground (fills) {
+  if(fills.length) {
+    const { color } = fills[0]
+  
+    return `background: ${transformCSSColor(color)};`
+  }
+}
+
+/**
+ * transform css shadows
+ * @param  {Object} shadows shadows
+ * @return {String}
+ */
+function transformCSSShadow (shadows) {
+  if(shadows.length){
+    const { offsetX, offsetY, blurRadius, color } = shadows[0]
+
+    return `box-shadow: ${offsetX}px ${offsetY}px ${blurRadius}px ${transformCSSColor(color)};`
+  }
+}
+
+/**
+ * transform css opacity
+ * @param  {Object} opacity opacity
+ * @return {String}
+ */
+function transformCSSOpacity (opacity) {
+  if( opacity && opacity != 1){
+    return 'opacity: '+ opacity
+  }
+}
+
+/**
+ * append css info
+ * @param  {Object} layer layer
+ * @param  {Object} layer result
+ * @return {Undefined}
+ */
+function appendCss(result) {
+  let tmp
+  const { type } = result
+
+  if(type){
+    switch(type){
+      case TYPE_MAP.shape:
+        tmp = [
+          `width: ${result.rect.width}px;`,
+          `height: ${result.rect.height}px;`,
+          transformCSSBackground(result.fills),
+          transformCSSBorder(result.borders),
+          transformCSSRadius(result.radius),
+          transformCSSShadow(result.shadows),
+          transformCSSOpacity(result.opacity)
+        ]
+        break
+      case TYPE_MAP.text:
+        tmp = [
+          `fontSize: ${result.fontSize};`,
+          `fontFamily: ${result.fontFace};`,
+          `fontWeight: ${FONT_WEIGHT[result.fontFace.split('-')[1]]};`,
+          `color: ${transformCSSColor(result.color)};`
+        ]
+        break
+      default:
+        tmp = [
+          `width: ${result.rect.width}`,
+          `height: ${result.rect.height}`,
+        ]
+        break
+    }
+  }
+
+  result.css = tmp.filter(t => t)
+}
+
+/**
+ * append rn css info
+ * @param  {Object} layer layer
+ * @param  {Object} layer result
+ * @return {Undefined}
+ */
+function appendRNCss(result) {
+  // todo merge rn attr
+  result.rncss = []
+}
+
 class Transformer {
-  constructor (meta, pages, { savePath, ignoreSymbolPage, foreignSymbols }) {
+  constructor (meta, pages, { savePath, ignoreSymbolPage, foreignSymbols, layerTextStyles }) {
     this.meta = meta
     this.pages = pages
     this.savePath = savePath
@@ -385,6 +508,7 @@ class Transformer {
       colors: []
     }
     this._foreignSymbols = foreignSymbols
+    this._layerTextStyles = layerTextStyles
   }
   getAllSymbols () {
     if (this.symbols) {
@@ -407,11 +531,20 @@ class Transformer {
     }
     return symbols
   }
+  getAllTextStyles () {
+    return this._layerTextStyles.objects.map( textStyle => {
+      return {
+        objectID: textStyle.do_objectID,
+        name: textStyle.name
+      }
+    })
+  }
   convert () {
     const pagesAndArtboards = this.meta.pagesAndArtboards
     const pages = this.pages
     const result = this.result
     const symbols = this.getAllSymbols()
+    const textStyles = this.getAllTextStyles()
     Object.keys(pagesAndArtboards).forEach(k => {
       const page = pages[k]
       const artboards = pagesAndArtboards[k].artboards
@@ -450,7 +583,8 @@ class Transformer {
           {
             savePath: this.savePath,
             assetsPath: this.assetsPath,
-            symbols
+            symbols,
+            textStyles
           },
           this.meta.appVersion
         ))
