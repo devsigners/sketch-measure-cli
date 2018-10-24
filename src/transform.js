@@ -361,7 +361,8 @@ function handleText (layer, result, appVersion, textStyles) {
   delete textInfo.color
 
   if(textStyles.length > 0 && layer.sharedStyleID) {
-    textInfo.textStyle = textStyles.find( ts => ts.objectID === layer.sharedStyleID).name
+    let _ts = textStyles.find( ts => ts.objectID === layer.sharedStyleID)
+    _ts && (textInfo.textStyle = _ts.name);
   }
 
   Object.assign(result, textInfo)
@@ -373,7 +374,9 @@ function handleText (layer, result, appVersion, textStyles) {
  * @return {String}
  */
 function transformCSSColor (color) {
-  return color.a === 1 ? color['color-hex'].split(' ')[0] : color['css-rgba']
+  if( color ){
+    return color.a === 1 ? color['color-hex'].split(' ')[0] : color['css-rgba']
+  }
 }
 
 /**
