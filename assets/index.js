@@ -849,7 +849,7 @@ I18N['zh-cn'] = {
                                 '<label data-label="' + _('Content') + '"><textarea id="content" rows="2" readonly="readonly">' + layerData.content + '</textarea></label>',
                             '</div>'
                         ].join('');
-                html.push(this.propertyType('TYPEFACE', [ fontFamily, textColor, fontSize, spacing, textStyle, content ].join('')));
+                html.push(this.propertyType('TYPEFACE', [ textStyle, fontFamily, textColor, fontSize, spacing, content ].join('')));
             }
             // BORDERS
             if(layerData.borders && layerData.borders.length > 0){
@@ -906,7 +906,8 @@ I18N['zh-cn'] = {
             // CODE TEMPLATE
             var tab = [
                 '<ul class="tab" id="code-tab" >',
-                '<li class="icon-css-panel" data-id="css-panel" data-codeType="css"></li>',
+                '<li class="icon-rncss-panel" data-id="rncss-panel" data-codeType="rncss" ></li>',
+                '<li class="icon-css-panel" data-id="css-panel" data-codeType="css" ></li>',
                 '<li class="icon-android-panel" data-id="android-panel" data-codeType="android" ></li>',
                 '<li class="icon-ios-panel" data-id="ios-panel" data-codeType="ios" ></li>',
                 '</ul>'].join('')
@@ -915,6 +916,12 @@ I18N['zh-cn'] = {
             var css = [
                 '<div id="css-panel" class="code-item item">',
                 '<label><textarea id="css" rows="' + (layerData.css.length + 1) + '" readonly="readonly">' + layerData.css.join("\r\n") + '</textarea></label>',
+                '</div>'].join('')
+
+            var rncss = [];
+            var rncss = [
+                '<div id="rncss-panel" class="code-item item">',
+                '<label><textarea id="rncss" rows="' + (layerData.rncss.length + 1) + '" readonly="readonly">' + layerData.rncss.join("\r\n") + '</textarea></label>',
                 '</div>'].join('')
 
             var android = [];
@@ -984,7 +991,7 @@ I18N['zh-cn'] = {
                         '</div>'
                 );
             }
-            html.push(this.propertyType('CODE TEMPLATE', [ tab, css, android.join(''), ios.join('') ].join(''), true));
+            html.push(this.propertyType('CODE TEMPLATE', [ tab, rncss, css, android.join(''), ios.join('') ].join(''), true));
             
             //  EXPORTABLE
             if(layerData.exportable && layerData.exportable.length > 0){

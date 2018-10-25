@@ -368,33 +368,18 @@ function handleText (layer, result, appVersion, textStyles) {
   Object.assign(result, textInfo)
 }
 
-/**
- * transform css color
- * @param  {Object} color color
- * @return {String}
- */
 function transformCSSColor (color) {
   if( color ){
     return color.a === 1 ? color['color-hex'].split(' ')[0] : color['css-rgba']
   }
 }
 
-/**
- * transform css radius
- * @param  {Object} radius radius
- * @return {String}
- */
 function transformCSSRadius (radius) {
   if(radius) {
     return `border-radius: ${radius}px;`
   }
 }
 
-/**
- * transform css border
- * @param  {Object} border border
- * @return {String}
- */
 function transformCSSBorder (border) {
   if(border.length) {
     const { thickness, color } = border[0]
@@ -403,11 +388,6 @@ function transformCSSBorder (border) {
   }
 }
 
-/**
- * transform css background
- * @param  {Object} fills fills
- * @return {String}
- */
 function transformCSSBackground (fills) {
   if(fills.length) {
     const { color } = fills[0]
@@ -416,11 +396,6 @@ function transformCSSBackground (fills) {
   }
 }
 
-/**
- * transform css shadows
- * @param  {Object} shadows shadows
- * @return {String}
- */
 function transformCSSShadow (shadows) {
   if(shadows.length){
     const { offsetX, offsetY, blurRadius, color } = shadows[0]
@@ -429,16 +404,62 @@ function transformCSSShadow (shadows) {
   }
 }
 
-/**
- * transform css opacity
- * @param  {Object} opacity opacity
- * @return {String}
- */
 function transformCSSOpacity (opacity) {
   if( opacity && opacity != 1){
-    return 'opacity: '+ opacity
+    return `opacity: ${opacity};`
   }
 }
+
+function transformRNBackground (fills) {
+  if(fills.length) {
+    const { color } = fills[0]
+  
+    return `backgroundColor: '${transformCSSColor(color)}',`
+  }
+}
+
+function transformRNBorder ( border ) {
+  if(border.length) {
+    const { thickness, color } = border[0]
+
+    return [
+      `borderWidth: ${thickness},`,
+      `borderColor: '${transformCSSColor(color)}',`,
+    ]
+  }
+  return []
+}
+
+function transformRNRadius ( radius ) {
+  if(radius) {
+    return `borderRadius: ${radius},`
+  }
+}
+
+function transformRNShadow ( shadows ) {
+  if(shadows.length){
+    const { offsetX, offsetY, blurRadius, color } = shadows[0]
+    let _shadowColor = color['color-hex'].split(' ')[0],
+        _shadowOpacity = color.a
+
+    return [
+      `shadowColor: '${_shadowColor}',`,
+      `shadowOpacity: ${_shadowOpacity},`,
+      `shadowRadius: ${blurRadius},`,
+      `shadowOffset: {`,
+      `  height: ${offsetY},`,
+      `  width: ${offsetX},`,
+      `},`,
+    ]
+  }
+  return []
+}
+
+ function transformRNOpacity ( opacity ) {
+  if( opacity && opacity != 1){
+    return `opacity: ${opacity},`
+  }
+ }
 
 /**
  * append css info
@@ -465,16 +486,16 @@ function appendCss(result) {
         break
       case TYPE_MAP.text:
         tmp = [
-          `fontSize: ${result.fontSize};`,
-          `fontFamily: ${result.fontFace};`,
-          `fontWeight: ${FONT_WEIGHT[result.fontFace.split('-')[1]]};`,
+          `font-size: ${result.fontSize};`,
+          `font-family: ${result.fontFace};`,
+          `font-weight: ${FONT_WEIGHT[result.fontFace.split('-')[1]]};`,
           `color: ${transformCSSColor(result.color)};`
         ]
         break
       default:
         tmp = [
-          `width: ${result.rect.width}`,
-          `height: ${result.rect.height}`,
+          `width: ${result.rect.width};`,
+          `height: ${result.rect.height};`,
         ]
         break
     }
@@ -490,8 +511,40 @@ function appendCss(result) {
  * @return {Undefined}
  */
 function appendRNCss(result) {
-  // todo merge rn attr
-  result.rncss = []
+  let tmp
+  const { type } = result
+
+  if(type){
+    switch(type){
+      case TYPE_MAP.shape:
+        tmp = [
+          `width: ${result.rect.width},`,
+          `height: ${result.rect.height},`,
+          transformRNBackground(result.fills),
+          transformRNRadius(result.radius),
+          transformRNOpacity(result.opacity),
+          ...transformRNBorder(result.borders),
+          ...transformRNShadow(result.shadows)
+        ]
+        break
+      case TYPE_MAP.text:
+        tmp = [
+          `fontSize: ${result.fontSize},`,
+          `fontFamily: '${result.fontFace}',`,
+          `fontWeight: '${FONT_WEIGHT[result.fontFace.split('-')[1]]}',`,
+          `color: '${transformCSSColor(result.color)}',`
+        ]
+        break
+      default:
+        tmp = [
+          `width: ${result.rect.width},`,
+          `height: ${result.rect.height}`,
+        ]
+        break
+    }
+  }
+
+  result.rncss = tmp.filter(t => t)
 }
 
 class Transformer {
