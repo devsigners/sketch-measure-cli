@@ -15,26 +15,30 @@ describe('Test parseSketchFile', () => {
       assert.deepStrictEqual(
         res.meta,
         {
-          commit: '4e7e2f5d7940a711b59f89190b5b7e3029f050f5',
-          version: 103,
-          fonts: ['PingFangSC-Regular'],
+          commit: '623a23f2c4848acdbb1a38c2689e571eb73eb823',
+          version: 112,
+          fonts: [
+            "PingFangSC-Ultralight",
+            "PingFangSC-Medium",
+            "PingFangSC-Semibold"
+          ],
           compatibilityVersion: 99,
           app: 'com.bohemiancoding.sketch3',
           autosaved: 0,
           variant: 'NONAPPSTORE',
           created:
           {
-            commit: '4e7e2f5d7940a711b59f89190b5b7e3029f050f5',
-            appVersion: '50.2',
-            build: 55047,
+            commit: '623a23f2c4848acdbb1a38c2689e571eb73eb823',
+            appVersion: '52.2',
+            build: 67145,
             app: 'com.bohemiancoding.sketch3',
             compatibilityVersion: 99,
-            version: 103,
+            version: 112,
             variant: 'NONAPPSTORE'
           },
-          saveHistory: ['NONAPPSTORE.55047'],
-          appVersion: '50.2',
-          build: 55047
+          saveHistory: ['NONAPPSTORE.67145'],
+          appVersion: '52.2',
+          build: 67145
         }
       )
       assert.ok(res.document)

@@ -588,12 +588,15 @@ class Transformer {
     return symbols
   }
   getAllTextStyles () {
-    return this._layerTextStyles.objects.map(textStyle => {
-      return {
-        objectID: textStyle.do_objectID,
-        name: textStyle.name
-      }
-    })
+    if(this._layerTextStyles){
+      return this._layerTextStyles.objects.map(textStyle => {
+        return {
+          objectID: textStyle.do_objectID,
+          name: textStyle.name
+        }
+      })
+    }
+    return {}
   }
   convert () {
     const pagesAndArtboards = this.meta.pagesAndArtboards
