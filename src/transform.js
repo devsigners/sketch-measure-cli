@@ -88,8 +88,8 @@ function transformExtraInfo (layer, result) {
   //   }
   // }
 
-  const radius = layer.fixedRadius;
-  radius && (result.radius = radius);
+  const radius = layer.fixedRadius
+  radius && (result.radius = radius)
 }
 
 /**
@@ -291,7 +291,7 @@ function transformLayer (layer, extra, appVersion) {
   REVERSED_KEYS.forEach(k => {
     result[k] = layer[k]
   })
-  
+
   transformStyle(layer, result)
   transformFrame(layer, result, extra.parentPos || {})
   transformExtraInfo(layer, result)
@@ -311,8 +311,8 @@ function transformLayer (layer, extra, appVersion) {
     )
   }
 
-  appendCss(result);
-  appendRNCss(result);
+  appendCss(result)
+  appendRNCss(result)
 
   return result
 }
@@ -360,28 +360,28 @@ function handleText (layer, result, appVersion, textStyles) {
   }
   delete textInfo.color
 
-  if(textStyles.length > 0 && layer.sharedStyleID) {
-    let _ts = textStyles.find( ts => ts.objectID === layer.sharedStyleID)
-    _ts && (textInfo.textStyle = _ts.name);
+  if (textStyles.length > 0 && layer.sharedStyleID) {
+    let _ts = textStyles.find(ts => ts.objectID === layer.sharedStyleID)
+    _ts && (textInfo.textStyle = _ts.name)
   }
 
   Object.assign(result, textInfo)
 }
 
 function transformCSSColor (color) {
-  if( color ){
+  if (color) {
     return color.a === 1 ? color['color-hex'].split(' ')[0] : color['css-rgba']
   }
 }
 
 function transformCSSRadius (radius) {
-  if(radius) {
+  if (radius) {
     return `border-radius: ${radius}px;`
   }
 }
 
 function transformCSSBorder (border) {
-  if(border.length) {
+  if (border.length) {
     const { thickness, color } = border[0]
 
     return `border: ${thickness}px solid ${transformCSSColor(color)};`
@@ -389,15 +389,15 @@ function transformCSSBorder (border) {
 }
 
 function transformCSSBackground (fills) {
-  if(fills.length) {
+  if (fills.length) {
     const { color } = fills[0]
-  
+
     return `background: ${transformCSSColor(color)};`
   }
 }
 
 function transformCSSShadow (shadows) {
-  if(shadows.length){
+  if (shadows.length) {
     const { offsetX, offsetY, blurRadius, color } = shadows[0]
 
     return `box-shadow: ${offsetX}px ${offsetY}px ${blurRadius}px ${transformCSSColor(color)};`
@@ -405,42 +405,42 @@ function transformCSSShadow (shadows) {
 }
 
 function transformCSSOpacity (opacity) {
-  if( opacity && opacity != 1){
+  if (opacity && opacity !== 1) {
     return `opacity: ${opacity};`
   }
 }
 
 function transformRNBackground (fills) {
-  if(fills.length) {
+  if (fills.length) {
     const { color } = fills[0]
-  
+
     return `backgroundColor: '${transformCSSColor(color)}',`
   }
 }
 
-function transformRNBorder ( border ) {
-  if(border.length) {
+function transformRNBorder (border) {
+  if (border.length) {
     const { thickness, color } = border[0]
 
     return [
       `borderWidth: ${thickness},`,
-      `borderColor: '${transformCSSColor(color)}',`,
+      `borderColor: '${transformCSSColor(color)}',`
     ]
   }
   return []
 }
 
-function transformRNRadius ( radius ) {
-  if(radius) {
+function transformRNRadius (radius) {
+  if (radius) {
     return `borderRadius: ${radius},`
   }
 }
 
-function transformRNShadow ( shadows ) {
-  if(shadows.length){
+function transformRNShadow (shadows) {
+  if (shadows.length) {
     const { offsetX, offsetY, blurRadius, color } = shadows[0]
-    let _shadowColor = color['color-hex'].split(' ')[0],
-        _shadowOpacity = color.a
+    let _shadowColor = color['color-hex'].split(' ')[0]
+    let _shadowOpacity = color.a
 
     return [
       `shadowColor: '${_shadowColor}',`,
@@ -449,17 +449,17 @@ function transformRNShadow ( shadows ) {
       `shadowOffset: {`,
       `  height: ${offsetY},`,
       `  width: ${offsetX},`,
-      `},`,
+      `},`
     ]
   }
   return []
 }
 
- function transformRNOpacity ( opacity ) {
-  if( opacity && opacity != 1){
+function transformRNOpacity (opacity) {
+  if (opacity && opacity !== 1) {
     return `opacity: ${opacity},`
   }
- }
+}
 
 /**
  * append css info
@@ -467,12 +467,12 @@ function transformRNShadow ( shadows ) {
  * @param  {Object} layer result
  * @return {Undefined}
  */
-function appendCss(result) {
+function appendCss (result) {
   let tmp
   const { type } = result
 
-  if(type){
-    switch(type){
+  if (type) {
+    switch (type) {
       case TYPE_MAP.shape:
         tmp = [
           `width: ${result.rect.width}px;`,
@@ -495,7 +495,7 @@ function appendCss(result) {
       default:
         tmp = [
           `width: ${result.rect.width};`,
-          `height: ${result.rect.height};`,
+          `height: ${result.rect.height};`
         ]
         break
     }
@@ -510,12 +510,12 @@ function appendCss(result) {
  * @param  {Object} layer result
  * @return {Undefined}
  */
-function appendRNCss(result) {
+function appendRNCss (result) {
   let tmp
   const { type } = result
 
-  if(type){
-    switch(type){
+  if (type) {
+    switch (type) {
       case TYPE_MAP.shape:
         tmp = [
           `width: ${result.rect.width},`,
@@ -538,7 +538,7 @@ function appendRNCss(result) {
       default:
         tmp = [
           `width: ${result.rect.width},`,
-          `height: ${result.rect.height}`,
+          `height: ${result.rect.height}`
         ]
         break
     }
@@ -588,7 +588,7 @@ class Transformer {
     return symbols
   }
   getAllTextStyles () {
-    return this._layerTextStyles.objects.map( textStyle => {
+    return this._layerTextStyles.objects.map(textStyle => {
       return {
         objectID: textStyle.do_objectID,
         name: textStyle.name
