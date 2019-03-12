@@ -288,7 +288,7 @@ I18N['zh-cn'] = {
             $('#screen').css({
                 width: this.zoomSize( this.current.width ),
                 height: this.zoomSize( this.current.height ),
-                background: '#FFF url(' + imageData + ') no-repeat',
+                background: '#FFF url("' + imageData + '") no-repeat',
                 backgroundSize: this.zoomSize( this.current.width ) + 'px ' + this.zoomSize( this.current.height ) + 'px'
             });
 
