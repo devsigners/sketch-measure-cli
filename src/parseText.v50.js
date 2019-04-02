@@ -16,11 +16,22 @@ class TextStyle {
   constructor (layer) {
     this.layer = layer
     this.textStyle = layer.style.textStyle
+    if (this.textStyle==undefined){
+	    //console.log(layer)
+	    return 
+    }
+    if ( layer.style.textStyle.encodedAttributes == undefined){
+      this.encodeAttr ={}
+    }else{
+      this.encodeAttr = layer.style.textStyle.encodedAttributes
+    }
+}
 
-    this.encodeAttr = layer.style.textStyle.encodedAttributes
-  }
 
   _getStyle () {
+    if (this.textStyle==undefined){
+	      return {}
+    }
     const fontSize = this.encodeAttr.MSAttributedStringFontAttribute.attributes.size
     const fontFace = this.encodeAttr.MSAttributedStringFontAttribute.attributes.name
     const paragraphStyle = this.encodeAttr.paragraphStyle || {}
