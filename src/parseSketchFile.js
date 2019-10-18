@@ -1,5 +1,5 @@
 const { createReadStream, readFile } = require('fs')
-const unzip = require('unzip')
+const unzip = require('unzipper')
 const tempfile = require('tempfile')
 const pReadFile = src => {
   return new Promise((resolve, reject) => {
@@ -11,18 +11,18 @@ const pReadFile = src => {
 
 module.exports = parseSketchFile
 
-function extractZipFile (src, dest, cb) {
+function extractZipFile(src, dest, cb) {
   const writer = unzip.Extract({ path: dest })
   writer.on('close', cb)
   writer.on('error', cb)
   createReadStream(src).pipe(writer)
 }
 
-function parseJSONFile (src) {
+function parseJSONFile(src) {
   return pReadFile(src).then(v => JSON.parse(v))
 }
 
-function parseSketchFile (src) {
+function parseSketchFile(src) {
   const dest = tempfile()
   return new Promise((resolve, reject) => {
     extractZipFile(src, dest, err => {

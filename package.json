@@ -11,7 +11,7 @@
     "debug": "^4.1.0",
     "mkdirp": "^0.5.1",
     "tempfile": "^2.0.0",
-    "unzip": "^0.1.11"
+    "unzipper": "^0.10.5"
   },
   "devDependencies": {
     "eslint": "^5.7.0",
