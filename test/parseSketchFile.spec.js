@@ -18,9 +18,9 @@ describe('Test parseSketchFile', () => {
           commit: '623a23f2c4848acdbb1a38c2689e571eb73eb823',
           version: 112,
           fonts: [
-            "PingFangSC-Ultralight",
-            "PingFangSC-Medium",
-            "PingFangSC-Semibold"
+            'PingFangSC-Ultralight',
+            'PingFangSC-Medium',
+            'PingFangSC-Semibold'
           ],
           compatibilityVersion: 99,
           app: 'com.bohemiancoding.sketch3',

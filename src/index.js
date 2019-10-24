@@ -10,7 +10,7 @@ const {
 
 module.exports = process
 
-function process (sketchFile, dest) {
+function process(sketchFile, dest) {
   const NAME_MAP = {}
   let transformer
   return parseSketchFile(sketchFile)

@@ -35,12 +35,12 @@ describe('Test transform', () => {
           opacity: 1,
           rect: { width: 201, height: 80, x: 87, y: 171 },
           css: [
-            "width: 201px;",
-            "height: 80px;"
+            'width: 201px;',
+            'height: 80px;'
           ],
           rncss: [
-            "width: 201,",
-            "height: 80,"
+            'width: 201,',
+            'height: 80,'
           ]
         }
       )
@@ -61,17 +61,17 @@ describe('Test transform', () => {
               g: 150,
               b: 150,
               a: 1,
-              "argb-hex": "#ff969696",
-              "color-hex": "#969696 100%",
-              "css-rgba": "rgba(150,150,150,1)",
-              "ui-color": "(r:0.59 g:0.59 b:0.59 a:1.00)"
+              'argb-hex': '#ff969696',
+              'color-hex': '#969696 100%',
+              'css-rgba': 'rgba(150,150,150,1)',
+              'ui-color': '(r:0.59 g:0.59 b:0.59 a:1.00)'
             }
           }],
           css: [
-            "width: 61px;",
-            "height: 80px;",
-            "background: #D7D7D7;",
-            "border: 1px solid #969696;"
+            'width: 61px;',
+            'height: 80px;',
+            'background: #D7D7D7;',
+            'border: 1px solid #969696;'
           ],
           fills: [{
             fillType: 'color',
@@ -81,20 +81,20 @@ describe('Test transform', () => {
               g: 215,
               b: 215,
               a: 1,
-              "argb-hex": "#ffD7D7D7",
-              "color-hex": "#D7D7D7 100%",
-              "css-rgba": "rgba(215,215,215,1)",
-              "ui-color": "(r:0.85 g:0.85 b:0.85 a:1.00)"
+              'argb-hex': '#ffD7D7D7',
+              'color-hex': '#D7D7D7 100%',
+              'css-rgba': 'rgba(215,215,215,1)',
+              'ui-color': '(r:0.85 g:0.85 b:0.85 a:1.00)'
             }
           }],
           shadows: [],
           opacity: 1,
           rect: { width: 61, height: 80, x: 157, y: 171 },
           rncss: [
-            "width: 61,",
-            "height: 80,",
+            'width: 61,',
+            'height: 80,',
             "backgroundColor: '#D7D7D7',",
-            "borderWidth: 1,",
+            'borderWidth: 1,',
             "borderColor: '#969696',"
           ]
         }
@@ -108,9 +108,9 @@ describe('Test transform', () => {
           rotation: 0,
           borders: [],
           css: [
-            "width: 61px;",
-            "height: 80px;",
-            "background: #D7D7D7;"
+            'width: 61px;',
+            'height: 80px;',
+            'background: #D7D7D7;'
           ],
           fills: [{
             fillType: 'color',
@@ -130,8 +130,8 @@ describe('Test transform', () => {
           opacity: 1,
           rect: { width: 61, height: 80, x: 227, y: 171 },
           rncss: [
-            "width: 61,",
-            "height: 80,",
+            'width: 61,',
+            'height: 80,',
             "backgroundColor: '#D7D7D7',"
           ]
         }

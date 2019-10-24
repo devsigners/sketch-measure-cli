@@ -1,4 +1,4 @@
-function parseText (layer) {
+function parseText(layer) {
   const textStyle = new TextStyle(layer)
   const text = layer.attributedString.string
 
@@ -13,14 +13,14 @@ function parseText (layer) {
 }
 
 class TextStyle {
-  constructor (layer) {
+  constructor(layer) {
     this.layer = layer
     this.textStyle = layer.style.textStyle
 
     this.encodeAttr = layer.style.textStyle.encodedAttributes
   }
 
-  _getStyle () {
+  _getStyle() {
     const fontSize = this.encodeAttr.MSAttributedStringFontAttribute.attributes.size
     const fontFace = this.encodeAttr.MSAttributedStringFontAttribute.attributes.name
     const paragraphStyle = this.encodeAttr.paragraphStyle || {}
@@ -45,7 +45,7 @@ class TextStyle {
         break
       }
     }
-    let lineHeight = paragraphStyle.maximumLineHeight
+    const lineHeight = paragraphStyle.maximumLineHeight
 
     const style = {
       color: this.encodeAttr.MSAttributedStringColorAttribute,
@@ -59,7 +59,7 @@ class TextStyle {
     return style
   }
 
-  getTextStyle () {
+  getTextStyle() {
     return this._getStyle()
   }
 }

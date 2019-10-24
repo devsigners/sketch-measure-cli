@@ -35,7 +35,7 @@ const FONT_WEIGHT = {
  * @param  {Object} result result
  * @return {Undefined}
  */
-function transformExportable (layer, result) {
+function transformExportable(layer, result) {
   const type = result.type
   if (type === TYPE_MAP.slice || (
     type === TYPE_MAP.symbolInstance
@@ -61,7 +61,7 @@ function transformExportable (layer, result) {
  * @param  {Object} pos    parent layer's position
  * @return {Undefined}
  */
-function transformFrame (layer, result, { x, y }) {
+function transformFrame(layer, result, { x, y }) {
   const frame = layer.frame
   result[frame._class] = {
     width: round(frame.width, 1),
@@ -77,7 +77,7 @@ function transformFrame (layer, result, { x, y }) {
  * @param  {Object} result object to save transformed result
  * @return {Undefined}
  */
-function transformExtraInfo (layer, result) {
+function transformExtraInfo(layer, result) {
   // Set radius
   // if (layer.layers) {
   //   const first = layer.layers[0]
@@ -98,7 +98,7 @@ function transformExtraInfo (layer, result) {
  * @param  {Object} result result
  * @return {Undefined}
  */
-function transformStyle (layer, result) {
+function transformStyle(layer, result) {
   const style = layer.style
   let opacity
   if (style) {
@@ -124,7 +124,7 @@ const GRADIENT_TYPES = ['linear', 'radial', 'angular']
  * @param  {Array} borders border style list
  * @return {Array}         transformed border style
  */
-function transformBorders (borders) {
+function transformBorders(borders) {
   if (!borders || !borders.length) return []
   return borders.filter(v => v.isEnabled)
     .map(v => {
@@ -148,7 +148,7 @@ function transformBorders (borders) {
  * @param  {Array} fills fill style list
  * @return {Array}         transformed fill style
  */
-function transformFills (fills) {
+function transformFills(fills) {
   if (!fills || !fills.length) return []
   return fills.filter(v => v.isEnabled)
     .map(v => {
@@ -170,7 +170,7 @@ function transformFills (fills) {
  * @param  {Array} shadows shadow style list
  * @return {Array}         transformed shadow style
  */
-function transformShadows (shadows) {
+function transformShadows(shadows) {
   if (!shadows || !shadows.length) return []
   return shadows.filter(v => v.isEnabled)
     .map(v => {
@@ -190,7 +190,7 @@ function transformShadows (shadows) {
  * @param  {Object} color sketch color object
  * @return {Object}       transformed color object
  */
-function transformColor (color) {
+function transformColor(color) {
   if (!color) return null
   const r = ~~(color.red * 255)
   const g = ~~(color.green * 255)
@@ -208,7 +208,7 @@ function transformColor (color) {
   }
 }
 
-function transformGradient (gradient) {
+function transformGradient(gradient) {
   const stops = gradient.stops.map(stop => {
     return {
       color: transformColor(stop.color),
@@ -224,7 +224,7 @@ function transformGradient (gradient) {
   return data
 }
 
-function transformPosition (position) {
+function transformPosition(position) {
   const parts = position.slice(1, -1).split(/,\s*/)
   return {
     x: +parts[0],
@@ -240,7 +240,7 @@ function transformPosition (position) {
  * @param  {String} appVersion app version
  * @return {Object}            transformed artboard data.
  */
-function transformArtboard (artboard, pageMeta, extra, appVersion) {
+function transformArtboard(artboard, pageMeta, extra, appVersion) {
   pageMeta.width = artboard.frame.width
   pageMeta.height = artboard.frame.height
   // Set extra.layers, give other transform* functions a way to operate layers.
@@ -252,7 +252,7 @@ function transformArtboard (artboard, pageMeta, extra, appVersion) {
     recursiveAppendLayers(layer, pageMeta.layers)
   })
   return pageMeta
-  function recursiveAppendLayers (layer, store) {
+  function recursiveAppendLayers(layer, store) {
     const _appendLayers = layer && layer._appendLayers
     if (!_appendLayers || !_appendLayers.length) {
       return
@@ -272,7 +272,7 @@ function transformArtboard (artboard, pageMeta, extra, appVersion) {
  * @param  {Object} layer layer data.
  * @return {String}       layer type.
  */
-function getLayerType (layer, extra) {
+function getLayerType(layer, extra) {
   if (TYPE_MAP[layer._class]) {
     return TYPE_MAP[layer._class]
   } else if (layer.exportOptions.exportFormats.length) {
@@ -283,7 +283,7 @@ function getLayerType (layer, extra) {
 
 const REVERSED_KEYS = ['name', 'rotation']
 
-function transformLayer (layer, extra, appVersion) {
+function transformLayer(layer, extra, appVersion) {
   const result = {
     objectID: layer.do_objectID,
     type: getLayerType(layer)
@@ -317,7 +317,7 @@ function transformLayer (layer, extra, appVersion) {
   return result
 }
 
-function shouldTransformSubLayers (layer) {
+function shouldTransformSubLayers(layer) {
   if (!layer || !layer.layers) return false
   return layer.layers.length > 1
 }
@@ -332,7 +332,7 @@ function shouldTransformSubLayers (layer) {
  * @param  {String} appVersion  app version
  * @return {Array}              layers should append
  */
-function handleSymbol (layer, result, extra, appVersion) {
+function handleSymbol(layer, result, extra, appVersion) {
   const symbolMasterLayer = extra.symbolMasterLayer
   if (!symbolMasterLayer) {
     console.warn(`Miss symbol: ${extra.processingSymbolID}.`)
@@ -350,7 +350,7 @@ function handleSymbol (layer, result, extra, appVersion) {
   })
 }
 
-function handleText (layer, result, appVersion, textStyles) {
+function handleText(layer, result, appVersion, textStyles) {
   if (result.type !== 'text') return
 
   const textInfo = parseFloat(appVersion) >= 50 ? parseTextV50(layer, result) : parseText(layer, result)
@@ -361,26 +361,26 @@ function handleText (layer, result, appVersion, textStyles) {
   delete textInfo.color
 
   if (textStyles.length > 0 && layer.sharedStyleID) {
-    let _ts = textStyles.find(ts => ts.objectID === layer.sharedStyleID)
+    const _ts = textStyles.find(ts => ts.objectID === layer.sharedStyleID)
     _ts && (textInfo.textStyle = _ts.name)
   }
 
   Object.assign(result, textInfo)
 }
 
-function transformCSSColor (color) {
+function transformCSSColor(color) {
   if (color) {
     return color.a === 1 ? color['color-hex'].split(' ')[0] : color['css-rgba']
   }
 }
 
-function transformCSSRadius (radius) {
+function transformCSSRadius(radius) {
   if (radius) {
     return `border-radius: ${radius}px;`
   }
 }
 
-function transformCSSBorder (border) {
+function transformCSSBorder(border) {
   if (border.length) {
     const { thickness, color } = border[0]
 
@@ -388,7 +388,7 @@ function transformCSSBorder (border) {
   }
 }
 
-function transformCSSBackground (fills) {
+function transformCSSBackground(fills) {
   if (fills.length) {
     const { color } = fills[0]
 
@@ -396,7 +396,7 @@ function transformCSSBackground (fills) {
   }
 }
 
-function transformCSSShadow (shadows) {
+function transformCSSShadow(shadows) {
   if (shadows.length) {
     const { offsetX, offsetY, blurRadius, color } = shadows[0]
 
@@ -404,13 +404,13 @@ function transformCSSShadow (shadows) {
   }
 }
 
-function transformCSSOpacity (opacity) {
+function transformCSSOpacity(opacity) {
   if (opacity && opacity !== 1) {
     return `opacity: ${opacity};`
   }
 }
 
-function transformRNBackground (fills) {
+function transformRNBackground(fills) {
   if (fills.length) {
     const { color } = fills[0]
 
@@ -418,7 +418,7 @@ function transformRNBackground (fills) {
   }
 }
 
-function transformRNBorder (border) {
+function transformRNBorder(border) {
   if (border.length) {
     const { thickness, color } = border[0]
 
@@ -430,32 +430,32 @@ function transformRNBorder (border) {
   return []
 }
 
-function transformRNRadius (radius) {
+function transformRNRadius(radius) {
   if (radius) {
     return `borderRadius: ${radius},`
   }
 }
 
-function transformRNShadow (shadows) {
+function transformRNShadow(shadows) {
   if (shadows.length) {
     const { offsetX, offsetY, blurRadius, color } = shadows[0]
-    let _shadowColor = color['color-hex'].split(' ')[0]
-    let _shadowOpacity = color.a
+    const _shadowColor = color['color-hex'].split(' ')[0]
+    const _shadowOpacity = color.a
 
     return [
       `shadowColor: '${_shadowColor}',`,
       `shadowOpacity: ${_shadowOpacity},`,
       `shadowRadius: ${blurRadius},`,
-      `shadowOffset: {`,
+      'shadowOffset: {',
       `  height: ${offsetY},`,
       `  width: ${offsetX},`,
-      `},`
+      '},'
     ]
   }
   return []
 }
 
-function transformRNOpacity (opacity) {
+function transformRNOpacity(opacity) {
   if (opacity && opacity !== 1) {
     return `opacity: ${opacity},`
   }
@@ -467,7 +467,7 @@ function transformRNOpacity (opacity) {
  * @param  {Object} layer result
  * @return {Undefined}
  */
-function appendCss (result) {
+function appendCss(result) {
   let tmp
   const { type } = result
 
@@ -510,7 +510,7 @@ function appendCss (result) {
  * @param  {Object} layer result
  * @return {Undefined}
  */
-function appendRNCss (result) {
+function appendRNCss(result) {
   let tmp
   const { type } = result
 
@@ -548,7 +548,7 @@ function appendRNCss (result) {
 }
 
 class Transformer {
-  constructor (meta, pages, { savePath, ignoreSymbolPage, foreignSymbols, layerTextStyles }) {
+  constructor(meta, pages, { savePath, ignoreSymbolPage, foreignSymbols, layerTextStyles }) {
     this.meta = meta
     this.pages = pages
     this.savePath = savePath
@@ -566,7 +566,8 @@ class Transformer {
     this._foreignSymbols = foreignSymbols
     this._layerTextStyles = layerTextStyles
   }
-  getAllSymbols () {
+
+  getAllSymbols() {
     if (this.symbols) {
       return this.symbols
     }
@@ -587,8 +588,9 @@ class Transformer {
     }
     return symbols
   }
-  getAllTextStyles () {
-    if(this._layerTextStyles){
+
+  getAllTextStyles() {
+    if (this._layerTextStyles) {
       return this._layerTextStyles.objects.map(textStyle => {
         return {
           objectID: textStyle.do_objectID,
@@ -598,7 +600,8 @@ class Transformer {
     }
     return {}
   }
-  convert () {
+
+  convert() {
     const pagesAndArtboards = this.meta.pagesAndArtboards
     const pages = this.pages
     const result = this.result
@@ -651,7 +654,8 @@ class Transformer {
     })
     return result
   }
-  isSymbol (layer) {
+
+  isSymbol(layer) {
     return layer._class === 'symbolMaster' || layer.symbolID
   }
 }

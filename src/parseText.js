@@ -4,7 +4,7 @@ const {
   simplifyPlist
 } = require('./deps/decodeUtils')
 
-function decodeText (archived) {
+function decodeText(archived) {
   const buffer = Buffer.from(archived._archive, 'base64')
   const plist = parseBuffer(buffer)[0]
   const unarchived = unarchivePlist(plist)
@@ -12,7 +12,7 @@ function decodeText (archived) {
   return simplified
 }
 
-function parseText (layer) {
+function parseText(layer) {
   const decodedTextAttributes = decodeText(layer.attributedString.archivedAttributedString)
   const textStyle = new TextStyle(layer)
   const text = decodedTextAttributes.NSString
@@ -44,11 +44,12 @@ function parseText (layer) {
 }
 
 class TextStyle {
-  constructor (layer) {
+  constructor(layer) {
     this.layer = layer
     this.textStyle = layer.style.textStyle
   }
-  _getStyle (attributes) {
+
+  _getStyle(attributes) {
     let {
       MSAttributedStringFontAttribute,
       NSColor,
@@ -82,7 +83,7 @@ class TextStyle {
         break
       }
     }
-    let lineHeight = NSParagraphStyle.NSMaxLineHeight
+    const lineHeight = NSParagraphStyle.NSMaxLineHeight
 
     const style = {
       color: this.decodeColor(NSColor),
@@ -97,7 +98,7 @@ class TextStyle {
   }
 
   // get style from textStyle.encodedAttributes
-  getParagraphStyle () {
+  getParagraphStyle() {
     const {
       MSAttributedStringFontAttribute,
       NSColor,
@@ -116,7 +117,7 @@ class TextStyle {
     })
   }
 
-  getTextStyle (styleIndex = null) {
+  getTextStyle(styleIndex = null) {
     const decodedTextAttributes = decodeText(this.layer.attributedString.archivedAttributedString)
     const { NSAttributes } = decodedTextAttributes
 
@@ -130,7 +131,7 @@ class TextStyle {
     return this._getStyle(textAttribute)
   }
 
-  decodeColor (NSColor) {
+  decodeColor(NSColor) {
     if (!NSColor || (!NSColor.NSComponents && !NSColor.NSRGB)) {
       return {
         red: 255,
@@ -144,7 +145,7 @@ class TextStyle {
       colors = NSColor.NSComponents.toString('ascii').split(' ')
     } else {
       // remove \u0000
-      const re = new RegExp(`\u0000`, 'g')
+      const re = new RegExp('\u0000', 'g')
       colors = NSColor.NSRGB.toString('ascii').replace(re, '').split(' ')
     }
     const [red, green, blue, alpha] = colors

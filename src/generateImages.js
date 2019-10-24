@@ -13,7 +13,7 @@ module.exports = {
 const RE_IMG = /Exported\s([^\n]+)@2x.png\n?/g
 
 // We should prevent to duplicate image with save name.
-function getFilesFromMsg (msg) {
+function getFilesFromMsg(msg) {
   const files = {}
   let match
   while ((match = RE_IMG.exec(msg)) != null) {
@@ -26,7 +26,7 @@ function getFilesFromMsg (msg) {
 //   return promisedExec(`${ROOT}/install.sh`)
 // }
 
-function generatePreviewImages (file, dest, scale) {
+function generatePreviewImages(file, dest, scale) {
   return promisedExec(`${sketchtool} -v`).then(() => {
     return promisedExec(`${sketchtool} export artboards ${escape(file)} --output=${escape(dest)} --format='png' --use-id-for-name=YES --scales='${scale || '2.0'}'`).then(
       msg => {
@@ -36,7 +36,7 @@ function generatePreviewImages (file, dest, scale) {
   })
 }
 
-function generateSliceImages (file, dest, scale) {
+function generateSliceImages(file, dest, scale) {
   return promisedExec(`${sketchtool} -v`).then(() => {
     return promisedExec(`${sketchtool} export slices ${escape(file)} --output=${escape(dest)} --format='png' --scales='${scale || '2.0'}'`).then(
       msg => {
@@ -46,11 +46,11 @@ function generateSliceImages (file, dest, scale) {
   })
 }
 
-function rename (src, dest) {
+function rename(src, dest) {
   return promisedExec(`mv ${escape(src)} ${escape(dest)}`)
 }
 
-function escape (url) {
+function escape(url) {
   // Wrap with quotes, so space, parenthese and other special characters
   // wont interrupt cli.
   return `"${url}"`

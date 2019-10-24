@@ -5,7 +5,7 @@ const mkdirp = require('mkdirp')
 
 module.exports = generate
 
-function copy (src, dest) {
+function copy(src, dest) {
   const writer = createWriteStream(dest)
   return new Promise((resolve, reject) => {
     writer.on('close', resolve)
@@ -22,7 +22,7 @@ function copy (src, dest) {
   })
 }
 
-function copyAssets (dest) {
+function copyAssets(dest) {
   const files = [
     'index.css',
     'index.js',
@@ -41,7 +41,7 @@ function copyAssets (dest) {
 }
 
 let INDEX_HTML
-function generateIndexHtml (data, dest) {
+function generateIndexHtml(data, dest) {
   if (!INDEX_HTML) {
     INDEX_HTML = readFileSync(resolve(__dirname, '../assets/index.html'), {
       encoding: 'utf8'
@@ -54,7 +54,7 @@ function generateIndexHtml (data, dest) {
   )
 }
 
-function generate (data, dest) {
+function generate(data, dest) {
   return copyAssets(dest).then(() => {
     return generateIndexHtml(
       data,

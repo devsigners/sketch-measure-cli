@@ -1,5 +1,4 @@
-extends:
-  - standard
+extends: standard
 env:
   node: true
 rules:
@@ -17,6 +16,10 @@ rules:
   operator-linebreak:
     - 2
     - "before"
+  no-control-regex: off
+  space-before-function-paren:
+    - "error"
+    - "never"
 globals:
   describe: true
   it: true
